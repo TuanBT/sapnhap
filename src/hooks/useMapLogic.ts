@@ -26,8 +26,8 @@ export const useMapLogic = ({
                                 beforeMapRef,
                                 mergedMapRef
                             }: MapLogicHookProps) => {
-    const [beforeProvinceName, setBeforeProvinceName] = useState('Hover vào bản đồ');
-    const [mergedProvinceName, setMergedProvinceName] = useState('Hover vào bản đồ');
+    const [beforeProvinceName, setBeforeProvinceName] = useState('Tên tỉnh trước sáp nhập');
+    const [mergedProvinceName, setMergedProvinceName] = useState('Tên tỉnh sau sáp nhập');
     const [relatedProvinces, setRelatedProvinces] = useState<string[]>([]);
     const [description, setDescription] = useState('');
     const [isActive, setIsActive] = useState(false);
@@ -216,8 +216,8 @@ export const useMapLogic = ({
 
         // Reset state
         setIsActive(false);
-        setBeforeProvinceName('Hover vào bản đồ');
-        setMergedProvinceName('Hover vào bản đồ');
+        setBeforeProvinceName('Tên tỉnh trước sáp nhập');
+        setMergedProvinceName('Tên tỉnh sau sáp nhập');
         setRelatedProvinces([]);
         setDescription('');
     }, []);

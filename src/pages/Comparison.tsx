@@ -86,7 +86,7 @@ const Comparison: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <MapDisplay
                         ref={beforeMapRef}
-                        title="Bản đồ Trước sáp nhập"
+                        title={beforeProvinceName}
                         count={provinces ? Object.keys(provinces).length : 0}
                         backgroundColor="bg-blue-500"
                         onProvinceHover={handleProvinceHover}
@@ -97,7 +97,7 @@ const Comparison: React.FC = () => {
 
                     <MapDisplay
                         ref={mergedMapRef}
-                        title="Bản đồ Sau sáp nhập"
+                        title={mergedProvinceName}
                         count={provincesMerged ? Object.keys(provincesMerged).length : 0}
                         backgroundColor="bg-green-500"
                         onProvinceHover={handleProvinceHover}
