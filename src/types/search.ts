@@ -1,0 +1,1 @@
+export type SearchFilter = 'all' | 'province' | 'district' | 'commune';

@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Comparison from './pages/Comparison';
-import Home from './pages/Home'; // Trang chính hiện tại
+import Home from './pages/Home';
+import Search from "./pages/Search.tsx"; // Trang chính hiện tại
 
 function App() {
     return (
@@ -35,6 +36,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/comparison" element={<Comparison />} />
+                    <Route path="/search" element={<Search />} />
                 </Routes>
             </div>
         </Router>
