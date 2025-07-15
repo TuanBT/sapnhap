@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useProvinceData } from '../hooks/useProvinceData';
 import { useMapLogic } from '../hooks/useMapLogic';
 import { SVGMerger } from '../utils/svgMerger';
-import MapDisplay from "../components/MapDisplay.tsx";
-import Header from "../components/Header.tsx";
-import InfoPanel from "../components/InfoPanel.tsx";
-
+import MapDisplay, { type MapDisplayRef } from '../components/MapDisplay';
+import Header from '../components/Header';
+import InfoPanel from '../components/InfoPanel';
 
 const Comparison: React.FC = () => {
     const { provinces, provincesMerged, provinceMapping, mergeInfo, loading, error } = useProvinceData();
     const [processedSvgContent, setProcessedSvgContent] = useState<string>('');
+
+    const currentMapRef = useRef<MapDisplayRef | null>(null);
+    const mergedMapRef = useRef<MapDisplayRef | null>(null);
 
     const {
         currentProvinceName,
@@ -23,7 +25,9 @@ const Comparison: React.FC = () => {
         provinces,
         provincesMerged,
         provinceMapping,
-        mergeInfo
+        mergeInfo,
+        currentMapRef,
+        mergedMapRef
     });
 
     // Process merged SVG
@@ -76,6 +80,7 @@ const Comparison: React.FC = () => {
                 {/* Maps */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <MapDisplay
+                        ref={currentMapRef}
                         title="Bản đồ Trước sáp nhập"
                         count={provinces ? Object.keys(provinces).length : 0}
                         backgroundColor="bg-blue-500"
@@ -86,6 +91,7 @@ const Comparison: React.FC = () => {
                     />
 
                     <MapDisplay
+                        ref={mergedMapRef}
                         title="Bản đồ Sau sáp nhập"
                         count={provincesMerged ? Object.keys(provincesMerged).length : 0}
                         backgroundColor="bg-green-500"

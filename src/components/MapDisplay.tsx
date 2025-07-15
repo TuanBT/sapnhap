@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 
 interface MapDisplayProps {
     title: string;
@@ -11,17 +11,25 @@ interface MapDisplayProps {
     processedSvgContent?: string;
 }
 
-const MapDisplay: React.FC<MapDisplayProps> = ({
-                                                   title,
-                                                   count,
-                                                   backgroundColor,
-                                                   onProvinceHover,
-                                                   onProvinceLeave,
-                                                   svgUrl,
-                                                   mapType,
-                                                   processedSvgContent
-                                               }) => {
+export interface MapDisplayRef {
+    getContainer: () => HTMLDivElement | null;
+}
+
+const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
+                                                                   title,
+                                                                   count,
+                                                                   backgroundColor,
+                                                                   onProvinceHover,
+                                                                   onProvinceLeave,
+                                                                   svgUrl,
+                                                                   mapType,
+                                                                   processedSvgContent
+                                                               }, ref) => {
     const mapRef = useRef<HTMLDivElement>(null);
+
+    useImperativeHandle(ref, () => ({
+        getContainer: () => mapRef.current
+    }));
 
     useEffect(() => {
         const loadSVG = async () => {
@@ -53,27 +61,32 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
         const svg = mapRef.current.querySelector('svg');
         if (!svg) return;
 
-        // Add styles
+        // Add styles - Remove transition để tránh conflict khi programmatically change style
         const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
         style.textContent = `
-      path, g[id*="VN-"] {
-        fill: #e5e7eb;
-        stroke: #9ca3af;
-        stroke-width: 0.5;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-      path:hover, g[id*="VN-"]:hover {
-        fill: #3b82f6;
-        stroke: #1e40af;
-        stroke-width: 1;
-      }
-    `;
+            path, g[id*="VN-"] {
+                fill: #e5e7eb;
+                stroke: #9ca3af;
+                stroke-width: 0.5;
+                cursor: pointer;
+            }
+            path:hover, g[id*="VN-"]:hover {
+                fill: #3b82f6;
+                stroke: #1e40af;
+                stroke-width: 1;
+            }
+        `;
         svg.insertBefore(style, svg.firstChild);
 
         // Add event listeners
         const elements = svg.querySelectorAll('path, g[id*="VN-"]');
-        elements.forEach((element) => {
+        console.log(`Setting up ${mapType} map - found ${elements.length} elements`);
+
+        elements.forEach((element, index) => {
+            if (index < 3) {
+                console.log(`${mapType} element ${index}: ${element.id}`);
+            }
+
             element.addEventListener('mouseenter', () => {
                 onProvinceHover(element as SVGElement, mapType);
             });
@@ -103,6 +116,8 @@ const MapDisplay: React.FC<MapDisplayProps> = ({
             </div>
         </div>
     );
-};
+});
+
+MapDisplay.displayName = 'MapDisplay';
 
 export default MapDisplay;
