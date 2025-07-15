@@ -190,13 +190,14 @@ const Home: React.FC = () => {
                 <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
                     <h2 className="text-xl font-bold mb-4">Danh sách tỉnh thành</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {provincesMerged && Object.keys(provincesMerged).map((provinceName, index) => (
+                        {provincesMerged && Object.values(provincesMerged).map((provinceName, index) => (
                             <div
                                 key={index}
                                 onClick={() => {
                                     setSelectedProvince(provinceName);
                                     setCurrentProvinceName(provinceName);
                                     setMergedProvinceName(provinceName);
+                                    setDescription(`Thông tin về ${provinceName}`);
                                     setIsActive(true);
 
                                     // Hiển thị thông tin chi tiết của tỉnh
@@ -223,28 +224,28 @@ const Home: React.FC = () => {
                         ))}
                     </div>
                 </div>
+
+                {/* Info Panel */}
+                <InfoPanel
+                    currentProvinceName={currentProvinceName}
+                    mergedProvinceName={mergedProvinceName}
+                    description={description}
+                    relatedProvinces={relatedProvinces}
+                    isActive={isActive}
+                />
+
+                {/* Reset Button */}
+                {isActive && (
+                    <div className="fixed bottom-6 right-6">
+                        <button
+                            onClick={handleReset}
+                            className="bg-red-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-600 transition-colors"
+                        >
+                            Reset
+                        </button>
+                    </div>
+                )}
             </div>
-
-            {/* Info Panel */}
-            <InfoPanel
-                currentProvinceName={currentProvinceName}
-                mergedProvinceName={mergedProvinceName}
-                description={description}
-                relatedProvinces={relatedProvinces}
-                isActive={isActive}
-            />
-
-            {/* Reset Button */}
-            {isActive && (
-                <div className="fixed bottom-6 right-6">
-                    <button
-                        onClick={handleReset}
-                        className="bg-red-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-red-600 transition-colors"
-                    >
-                        Reset
-                    </button>
-                </div>
-            )}
         </div>
     );
 };

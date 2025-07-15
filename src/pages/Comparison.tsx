@@ -75,6 +75,13 @@ const Comparison: React.FC = () => {
             <Header />
 
             <div className="container mx-auto px-4 pb-8 pt-3">
+                {/* Info Panel */}
+                <InfoPanel
+                    currentProvinceName={currentProvinceName}
+                    mergedProvinceName={mergedProvinceName}
+                    isActive={isActive}
+                />
+
                 {/* Maps */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <MapDisplay
@@ -100,13 +107,6 @@ const Comparison: React.FC = () => {
                         processedSvgContent={processedSvgContent}
                     />
                 </div>
-
-                {/* Info Panel */}
-                <InfoPanel
-                    currentProvinceName={currentProvinceName}
-                    mergedProvinceName={mergedProvinceName}
-                    isActive={isActive}
-                />
             </div>
         </div>
     );

@@ -1,11 +1,19 @@
 import { useState, useCallback, useRef, type RefObject } from 'react';
 import { type MapDisplayRef } from '../components/MapDisplay';
 
+interface MergeInfo {
+    [key: string]: {
+        name: string;
+        originalProvinces: string[];
+        description?: string;
+    };
+}
+
 interface MapLogicHookProps {
     provinces: Record<string, string> | null;
     provincesMerged: Record<string, string> | null;
     provinceMapping: Record<string, string> | null;
-    mergeInfo: Record<string, any> | null;
+    mergeInfo: MergeInfo | null;
     currentMapRef?: RefObject<MapDisplayRef | null>;
     mergedMapRef?: RefObject<MapDisplayRef | null>;
 }
@@ -79,17 +87,21 @@ export const useMapLogic = ({
             const mappedId = provinceMapping[provinceId];
             if (mappedId) {
                 targetIds = [mappedId];
-                console.log(`Mapping ${provinceId} -> ${mappedId}`);
+                console.log(`Mapping ${provinceId} (${provinces[provinceId]}) -> ${mappedId} (${provincesMerged[mappedId]})`);
+            } else {
+                console.warn(`No mapping found for ${provinceId} (${provinces[provinceId]})`);
             }
         } else {
             // Từ bản đồ sau sáp nhập -> tìm các tỉnh tương ứng ở bản đồ trước sáp nhập
             const info = mergeInfo[provinceId];
             if (info && info.originalProvinces) {
-                // Tìm các ID tỉnh cũ từ tên tỉnh
-                targetIds = Object.keys(provinces).filter(id =>
-                    info.originalProvinces.includes(provinces[id])
+                // Tìm tất cả các tỉnh cũ map tới tỉnh này
+                targetIds = Object.keys(provinceMapping).filter(oldId =>
+                    provinceMapping[oldId] === provinceId
                 );
-                console.log(`Reverse mapping ${provinceId} -> ${targetIds}`);
+                console.log(`Reverse mapping ${provinceId} (${provincesMerged[provinceId]}) -> ${targetIds.map(id => `${id} (${provinces[id]})`).join(', ')}`);
+            } else {
+                console.warn(`No merge info found for ${provinceId} (${provincesMerged[provinceId]})`);
             }
         }
 
@@ -144,29 +156,33 @@ export const useMapLogic = ({
                 const info = mergeInfo[mappedId];
                 if (info) {
                     currentName = info.originalProvinces.join(', ');
-                    desc = info.description;
+                    desc = info.description || `${currentProvinceName} được sáp nhập vào ${mergedName}`;
                     related = info.originalProvinces;
                 } else {
                     currentName = currentProvinceName;
-                    desc = `${currentProvinceName} không có thông tin sáp nhập`;
+                    desc = `${currentProvinceName} được sáp nhập vào ${mergedName}`;
+                    related = [currentProvinceName];
                 }
             } else {
+                // Tỉnh không được sáp nhập hoặc không tìm thấy mapping
                 currentName = currentProvinceName;
                 mergedName = currentProvinceName;
-                desc = `${currentProvinceName} không được sáp nhập`;
+                desc = `${currentProvinceName} không được sáp nhập hoặc không có thông tin`;
+                related = [currentProvinceName];
             }
         } else {
-            // Từ bản đồ sau sáp nhập (33 tỉnh)
+            // Từ bản đồ sau sáp nhập (34 tỉnh)
             mergedName = provincesMerged[provinceId] || provinceId;
             console.log(`Merged province name: ${mergedName}`);
 
             const info = mergeInfo[provinceId];
-            if (info) {
+            if (info && info.originalProvinces) {
                 currentName = info.originalProvinces.join(', ');
                 related = info.originalProvinces;
-                desc = info.description;
+                desc = info.description || `${mergedName} được tạo thành từ việc sáp nhập ${info.originalProvinces.join(', ')}`;
             } else {
                 currentName = mergedName;
+                related = [mergedName];
                 desc = `${mergedName} không có thông tin sáp nhập`;
             }
         }
@@ -200,8 +216,8 @@ export const useMapLogic = ({
 
         // Reset state
         setIsActive(false);
-        setCurrentProvinceName('Di chuột vào bản đồ');
-        setMergedProvinceName('Di chuột vào bản đồ');
+        setCurrentProvinceName('Hover vào bản đồ');
+        setMergedProvinceName('Hover vào bản đồ');
         setRelatedProvinces([]);
         setDescription('');
     }, []);

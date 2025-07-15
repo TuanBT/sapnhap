@@ -1,5 +1,10 @@
-
-import type { MergeInfo } from '../types';
+interface MergeInfo {
+    [key: string]: {
+        name: string;
+        originalProvinces: string[];
+        description?: string;
+    };
+}
 
 interface MergeGroup {
     newId: string;

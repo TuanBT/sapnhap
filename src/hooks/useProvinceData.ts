@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 
 interface ProvinceData {
@@ -9,7 +8,7 @@ interface MergeInfo {
     [key: string]: {
         name: string;
         originalProvinces: string[];
-        description: string;
+        description?: string;
     };
 }
 
@@ -34,28 +33,48 @@ export function useProvinceData(): UseProvinceDataReturn {
         const loadData = async () => {
             try {
                 // Load tất cả file JSON
-                const [provincesRes, provincesMergedRes, provinceMappingRes, mergeInfoRes] = await Promise.all([
+                const [provincesRes, provincesMergedRes, mergeInfoRes] = await Promise.all([
                     fetch('/provinces.json'),
                     fetch('/provinces-merged.json'),
-                    fetch('/province-mapping.json'),
                     fetch('/merge-info.json')
                 ]);
 
                 if (!provincesRes.ok) throw new Error('Failed to load provinces.json');
                 if (!provincesMergedRes.ok) throw new Error('Failed to load provinces-merged.json');
-                if (!provinceMappingRes.ok) throw new Error('Failed to load province-mapping.json');
                 if (!mergeInfoRes.ok) throw new Error('Failed to load merge-info.json');
 
-                const [provincesData, provincesMergedData, provinceMappingData, mergeInfoData] = await Promise.all([
+                const [provincesData, provincesMergedData, mergeInfoData] = await Promise.all([
                     provincesRes.json(),
                     provincesMergedRes.json(),
-                    provinceMappingRes.json(),
                     mergeInfoRes.json()
                 ]);
 
+                // Tạo mapping từ merge-info
+                const generatedMapping: { [key: string]: string } = {};
+
+                // Với mỗi tỉnh sau sáp nhập, tìm các tỉnh gốc và map chúng
+                Object.entries(mergeInfoData).forEach(([mergedId, info]) => {
+                    // Type assertion để TypeScript biết structure của info
+                    const mergeInfo = info as { name: string; originalProvinces: string[]; description?: string };
+                    const originalProvinces = mergeInfo.originalProvinces;
+
+                    // Tìm ID của các tỉnh gốc trong provinces.json
+                    Object.entries(provincesData as { [key: string]: string }).forEach(([provinceId, provinceName]) => {
+                        // Kiểm tra xem tỉnh này có trong danh sách originalProvinces không
+                        if (originalProvinces.includes(provinceName)) {
+                            generatedMapping[provinceId] = mergedId;
+                        }
+                    });
+                });
+
+                console.log('Generated mapping:', generatedMapping);
+                console.log('Provinces:', provincesData);
+                console.log('Provinces merged:', provincesMergedData);
+                console.log('Merge info:', mergeInfoData);
+
                 setProvinces(provincesData);
                 setProvincesMerged(provincesMergedData);
-                setProvinceMapping(provinceMappingData);
+                setProvinceMapping(generatedMapping);
                 setMergeInfo(mergeInfoData);
 
             } catch (err) {
