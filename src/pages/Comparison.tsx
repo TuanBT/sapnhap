@@ -10,11 +10,11 @@ const Comparison: React.FC = () => {
     const { provinces, provincesMerged, provinceMapping, mergeInfo, loading, error } = useProvinceData();
     const [processedSvgContent, setProcessedSvgContent] = useState<string>('');
 
-    const currentMapRef = useRef<MapDisplayRef | null>(null);
+    const beforeMapRef = useRef<MapDisplayRef | null>(null);
     const mergedMapRef = useRef<MapDisplayRef | null>(null);
 
     const {
-        currentProvinceName,
+        beforeProvinceName,
         mergedProvinceName,
         isActive,
         handleProvinceHover,
@@ -24,7 +24,7 @@ const Comparison: React.FC = () => {
         provincesMerged,
         provinceMapping,
         mergeInfo,
-        currentMapRef,
+        beforeMapRef,
         mergedMapRef
     });
 
@@ -77,7 +77,7 @@ const Comparison: React.FC = () => {
             <div className="container mx-auto px-4 pb-8 pt-3">
                 {/* Info Panel */}
                 <InfoPanel
-                    currentProvinceName={currentProvinceName}
+                    beforeProvinceName={beforeProvinceName}
                     mergedProvinceName={mergedProvinceName}
                     isActive={isActive}
                 />
@@ -85,14 +85,14 @@ const Comparison: React.FC = () => {
                 {/* Maps */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <MapDisplay
-                        ref={currentMapRef}
+                        ref={beforeMapRef}
                         title="Bản đồ Trước sáp nhập"
                         count={provinces ? Object.keys(provinces).length : 0}
                         backgroundColor="bg-blue-500"
                         onProvinceHover={handleProvinceHover}
                         onProvinceLeave={handleProvinceLeave}
                         svgUrl="/vn.svg"
-                        mapType="current"
+                        mapType="before"
                     />
 
                     <MapDisplay

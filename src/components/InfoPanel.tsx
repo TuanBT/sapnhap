@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 interface InfoPanelProps {
-    currentProvinceName: string;
+    beforeProvinceName: string;
     mergedProvinceName: string;
     isActive: boolean;
     description?: string;
@@ -11,7 +11,7 @@ interface InfoPanelProps {
 }
 
 const InfoPanel: React.FC<InfoPanelProps> = ({
-                                                 currentProvinceName,
+                                                 beforeProvinceName,
                                                  mergedProvinceName,
                                                  isActive,
                                                  description,
@@ -23,7 +23,7 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
                 <div className="flex-1 text-center">
                     <div
                         className={`text-lg font-medium min-h-[50px] flex items-center justify-center p-2 rounded bg-blue-50 text-blue-700 border border-blue-500 ${isActive ? 'shadow' : ''}`}>
-                        {currentProvinceName}
+                        {beforeProvinceName}
                     </div>
                 </div>
 

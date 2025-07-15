@@ -14,7 +14,7 @@ interface MapLogicHookProps {
     provincesMerged: Record<string, string> | null;
     provinceMapping: Record<string, string> | null;
     mergeInfo: MergeInfo | null;
-    currentMapRef?: RefObject<MapDisplayRef | null>;
+    beforeMapRef?: RefObject<MapDisplayRef | null>;
     mergedMapRef?: RefObject<MapDisplayRef | null>;
 }
 
@@ -23,17 +23,17 @@ export const useMapLogic = ({
                                 provincesMerged,
                                 provinceMapping,
                                 mergeInfo,
-                                currentMapRef,
+                                beforeMapRef,
                                 mergedMapRef
                             }: MapLogicHookProps) => {
-    const [currentProvinceName, setCurrentProvinceName] = useState('Hover vào bản đồ');
+    const [beforeProvinceName, setBeforeProvinceName] = useState('Hover vào bản đồ');
     const [mergedProvinceName, setMergedProvinceName] = useState('Hover vào bản đồ');
     const [relatedProvinces, setRelatedProvinces] = useState<string[]>([]);
     const [description, setDescription] = useState('');
     const [isActive, setIsActive] = useState(false);
 
     // Fallback refs nếu không được truyền từ ngoài
-    const fallbackCurrentMapRef = useRef<HTMLDivElement>(null);
+    const fallbackBeforeMapRef = useRef<HTMLDivElement>(null);
     const fallbackMergedMapRef = useRef<HTMLDivElement>(null);
 
     // Helper function để highlight element
@@ -56,11 +56,11 @@ export const useMapLogic = ({
     };
 
     // Helper function để lấy SVG container
-    const getSVGContainer = (mapType: 'current' | 'merged'): SVGElement | null => {
+    const getSVGContainer = (mapType: 'before' | 'merged'): SVGElement | null => {
         let container: HTMLDivElement | null = null;
 
-        if (mapType === 'current') {
-            container = currentMapRef?.current?.getContainer() || fallbackCurrentMapRef.current;
+        if (mapType === 'before') {
+            container = beforeMapRef?.current?.getContainer() || fallbackBeforeMapRef.current;
         } else {
             container = mergedMapRef?.current?.getContainer() || fallbackMergedMapRef.current;
         }
@@ -69,10 +69,10 @@ export const useMapLogic = ({
     };
 
     // Helper function để highlight tỉnh tương ứng ở bản đồ khác
-    const highlightCorrespondingProvince = (provinceId: string, mapType: 'current' | 'merged') => {
+    const highlightCorrespondingProvince = (provinceId: string, mapType: 'before' | 'merged') => {
         if (!provinces || !provincesMerged || !provinceMapping || !mergeInfo) return;
 
-        const otherMapType = mapType === 'current' ? 'merged' : 'current';
+        const otherMapType = mapType === 'before' ? 'merged' : 'before';
         const otherSvg = getSVGContainer(otherMapType);
 
         if (!otherSvg) {
@@ -82,7 +82,7 @@ export const useMapLogic = ({
 
         let targetIds: string[] = [];
 
-        if (mapType === 'current') {
+        if (mapType === 'before') {
             // Từ bản đồ hiện tại -> tìm tỉnh tương ứng ở bản đồ sau sáp nhập
             const mappedId = provinceMapping[provinceId];
             if (mappedId) {
@@ -117,7 +117,7 @@ export const useMapLogic = ({
         });
     };
 
-    const handleProvinceHover = useCallback((element: SVGElement, mapType: 'current' | 'merged') => {
+    const handleProvinceHover = useCallback((element: SVGElement, mapType: 'before' | 'merged') => {
         if (!provinces || !provincesMerged || !provinceMapping || !mergeInfo) return;
 
         const provinceId = element.id;
@@ -136,15 +136,15 @@ export const useMapLogic = ({
         // Highlight tỉnh tương ứng ở bản đồ khác
         highlightCorrespondingProvince(provinceId, mapType);
 
-        let currentName = '';
+        let beforeName = '';
         let mergedName = '';
         let related: string[] = [];
         let desc = '';
 
-        if (mapType === 'current') {
+        if (mapType === 'before') {
             // Từ bản đồ hiện tại (63 tỉnh)
-            const currentProvinceName = provinces[provinceId] || provinceId;
-            console.log(`Current province name: ${currentProvinceName}`);
+            const beforeProvinceName = provinces[provinceId] || provinceId;
+            console.log(`Before province name: ${beforeProvinceName}`);
 
             const mappedId = provinceMapping[provinceId];
             console.log(`Mapped ID: ${mappedId}`);
@@ -155,20 +155,20 @@ export const useMapLogic = ({
 
                 const info = mergeInfo[mappedId];
                 if (info) {
-                    currentName = info.originalProvinces.join(', ');
-                    desc = info.description || `${currentProvinceName} được sáp nhập vào ${mergedName}`;
+                    beforeName = info.originalProvinces.join(', ');
+                    desc = info.description || `${beforeProvinceName} được sáp nhập vào ${mergedName}`;
                     related = info.originalProvinces;
                 } else {
-                    currentName = currentProvinceName;
-                    desc = `${currentProvinceName} được sáp nhập vào ${mergedName}`;
-                    related = [currentProvinceName];
+                    beforeName = beforeProvinceName;
+                    desc = `${beforeProvinceName} được sáp nhập vào ${mergedName}`;
+                    related = [beforeProvinceName];
                 }
             } else {
                 // Tỉnh không được sáp nhập hoặc không tìm thấy mapping
-                currentName = currentProvinceName;
-                mergedName = currentProvinceName;
-                desc = `${currentProvinceName} không được sáp nhập hoặc không có thông tin`;
-                related = [currentProvinceName];
+                beforeName = beforeProvinceName;
+                mergedName = beforeProvinceName;
+                desc = `${beforeProvinceName} không được sáp nhập hoặc không có thông tin`;
+                related = [beforeProvinceName];
             }
         } else {
             // Từ bản đồ sau sáp nhập (34 tỉnh)
@@ -177,25 +177,25 @@ export const useMapLogic = ({
 
             const info = mergeInfo[provinceId];
             if (info && info.originalProvinces) {
-                currentName = info.originalProvinces.join(', ');
+                beforeName = info.originalProvinces.join(', ');
                 related = info.originalProvinces;
                 desc = info.description || `${mergedName} được tạo thành từ việc sáp nhập ${info.originalProvinces.join(', ')}`;
             } else {
-                currentName = mergedName;
+                beforeName = mergedName;
                 related = [mergedName];
                 desc = `${mergedName} không có thông tin sáp nhập`;
             }
         }
 
         console.log('Final result:', {
-            currentName,
+            beforeName,
             mergedName,
             related,
             desc
         });
 
         // Cập nhật state
-        setCurrentProvinceName(currentName);
+        setBeforeProvinceName(beforeName);
         setMergedProvinceName(mergedName);
         setRelatedProvinces(related);
         setDescription(desc);
@@ -204,8 +204,8 @@ export const useMapLogic = ({
 
     const handleProvinceLeave = useCallback(() => {
         // Reset colors cho cả 2 bản đồ
-        ['current', 'merged'].forEach((mapType) => {
-            const svg = getSVGContainer(mapType as 'current' | 'merged');
+        ['before', 'merged'].forEach((mapType) => {
+            const svg = getSVGContainer(mapType as 'before' | 'merged');
             if (svg) {
                 const elements = svg.querySelectorAll('path, g[id*="VN-"]');
                 elements.forEach(element => {
@@ -216,19 +216,19 @@ export const useMapLogic = ({
 
         // Reset state
         setIsActive(false);
-        setCurrentProvinceName('Hover vào bản đồ');
+        setBeforeProvinceName('Hover vào bản đồ');
         setMergedProvinceName('Hover vào bản đồ');
         setRelatedProvinces([]);
         setDescription('');
     }, []);
 
     return {
-        currentProvinceName,
+        beforeProvinceName,
         mergedProvinceName,
         relatedProvinces,
         description,
         isActive,
-        currentMapRef: fallbackCurrentMapRef,
+        beforeMapRef: fallbackBeforeMapRef,
         mergedMapRef: fallbackMergedMapRef,
         handleProvinceHover,
         handleProvinceLeave

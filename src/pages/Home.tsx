@@ -13,7 +13,7 @@ const Home: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
     const [selectedProvince, setSelectedProvince] = useState<string | null>(null);
-    const [currentProvinceName, setCurrentProvinceName] = useState('Chọn tỉnh để xem thông tin');
+    const [beforeProvinceName, setBeforeProvinceName] = useState('Chọn tỉnh để xem thông tin');
     const [mergedProvinceName, setMergedProvinceName] = useState('Chọn tỉnh để xem thông tin');
     const [relatedProvinces, setRelatedProvinces] = useState<string[]>([]);
     const [isActive, setIsActive] = useState(false);
@@ -61,7 +61,7 @@ const Home: React.FC = () => {
     // Xử lý khi chọn tỉnh từ kết quả tìm kiếm
     const handleProvinceSelect = (result: SearchResult) => {
         setSelectedProvince(result.newName);
-        setCurrentProvinceName(result.oldName || result.newName);
+        setBeforeProvinceName(result.oldName || result.newName);
         setMergedProvinceName(result.newName);
         setDescription(`Thông tin về ${result.newName}`);
         setIsActive(true);
@@ -85,7 +85,7 @@ const Home: React.FC = () => {
     // Reset selection
     const handleReset = () => {
         setSelectedProvince(null);
-        setCurrentProvinceName('Chọn tỉnh để xem thông tin');
+        setBeforeProvinceName('Chọn tỉnh để xem thông tin');
         setMergedProvinceName('Chọn tỉnh để xem thông tin');
         setRelatedProvinces([]);
         setDescription('');
@@ -195,7 +195,7 @@ const Home: React.FC = () => {
                                 key={index}
                                 onClick={() => {
                                     setSelectedProvince(provinceName);
-                                    setCurrentProvinceName(provinceName);
+                                    setBeforeProvinceName(provinceName);
                                     setMergedProvinceName(provinceName);
                                     setDescription(`Thông tin về ${provinceName}`);
                                     setIsActive(true);
@@ -227,7 +227,7 @@ const Home: React.FC = () => {
 
                 {/* Info Panel */}
                 <InfoPanel
-                    currentProvinceName={currentProvinceName}
+                    beforeProvinceName={beforeProvinceName}
                     mergedProvinceName={mergedProvinceName}
                     description={description}
                     relatedProvinces={relatedProvinces}

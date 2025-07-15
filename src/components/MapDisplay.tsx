@@ -4,10 +4,10 @@ interface MapDisplayProps {
     title: string;
     count: number;
     backgroundColor: string;
-    onProvinceHover: (element: SVGElement, mapType: 'current' | 'merged') => void;
+    onProvinceHover: (element: SVGElement, mapType: 'before' | 'merged') => void;
     onProvinceLeave: () => void;
     svgUrl: string;
-    mapType: 'current' | 'merged';
+    mapType: 'before' | 'merged';
     processedSvgContent?: string;
 }
 
