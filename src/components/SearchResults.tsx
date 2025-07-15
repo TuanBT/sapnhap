@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import type { SearchItem } from '../hooks/useSearchData';
-import SearchResultCard from './SearchResultCard';
+import type { FlatItem } from '../hooks/useSearchData';
+import SimpleSearchResult from './SimpleSearchResult';
 
 interface SearchResultsProps {
-    results: SearchItem[];
+    results: FlatItem[];
     searchQuery: string;
 }
 
@@ -16,35 +16,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
     const endIndex = startIndex + itemsPerPage;
     const currentResults = results.slice(startIndex, endIndex);
 
-    const getTypeIcon = (type: string) => {
-        switch (type) {
-            case 'province': return '🏛️';
-            case 'district': return '🏢';
-            case 'commune': return '🏘️';
-            default: return '📍';
-        }
-    };
-
-    const getTypeLabel = (type: string) => {
-        switch (type) {
-            case 'province': return 'Tỉnh/Thành phố';
-            case 'district': return 'Huyện/Quận';
-            case 'commune': return 'Xã/Phường';
-            default: return 'Khác';
-        }
-    };
-
     if (results.length === 0) {
         return (
-            <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-                <div className="text-gray-400 text-6xl mb-4">🔍</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <div className="text-gray-300 text-6xl mb-4">🔍</div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
                     Không tìm thấy kết quả
                 </h3>
                 <p className="text-gray-600">
                     {searchQuery
-                        ? `Không tìm thấy kết quả cho "${searchQuery}"`
-                        : 'Hãy nhập từ khóa để tìm kiếm'
+                        ? `Thử tìm kiếm với từ khóa khác thay vì "${searchQuery}"`
+                        : 'Nhập tên tỉnh, huyện, xã để tìm kiếm thông tin sáp nhập'
                     }
                 </p>
             </div>
@@ -52,74 +34,100 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
     }
 
     return (
-        <div className="space-y-4">
-            <div className="bg-white rounded-lg shadow-lg p-4">
+        <div className="space-y-6">
+            {/* Results header */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                 <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold text-gray-900">
-                        Kết quả tìm kiếm
-                    </h2>
-                    <div className="text-sm text-gray-600">
-                        Tìm thấy {results.length} kết quả
-                        {searchQuery && ` cho "${searchQuery}"`}
+                    <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-2">
+                            <span className="text-blue-500 font-semibold">📊 Kết quả:</span>
+                            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
+                                {results.length} đơn vị
+                            </span>
+                        </div>
+                        {searchQuery && (
+                            <div className="text-sm text-gray-500">
+                                Tìm kiếm: "<span className="font-medium">{searchQuery}</span>"
+                            </div>
+                        )}
                     </div>
+
+                    {totalPages > 1 && (
+                        <div className="text-sm text-gray-500">
+                            Trang {currentPage} / {totalPages}
+                        </div>
+                    )}
                 </div>
             </div>
 
+            {/* Results list */}
             <div className="space-y-4">
-                {currentResults.map((item) => (
-                    <SearchResultCard
-                        key={item.id}
+                {currentResults.map((item, index) => (
+                    <SimpleSearchResult
+                        key={`${item.fullPath}-${index}`}
                         item={item}
                         searchQuery={searchQuery}
-                        icon={getTypeIcon(item.type)}
-                        typeLabel={getTypeLabel(item.type)}
                     />
                 ))}
             </div>
 
+            {/* Pagination */}
             {totalPages > 1 && (
-                <div className="bg-white rounded-lg shadow-lg p-4">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
                     <div className="flex items-center justify-between">
-                        <div className="text-sm text-gray-600">
-                            Hiển thị {startIndex + 1} - {Math.min(endIndex, results.length)} của {results.length} kết quả
-                        </div>
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={currentPage === 1}
+                            className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <span>←</span>
+                            <span>Trang trước</span>
+                        </button>
 
                         <div className="flex items-center space-x-2">
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                                disabled={currentPage === 1}
-                                className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Trước
-                            </button>
+                            {/* Page numbers */}
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                const pageNum = i + 1;
+                                return (
+                                    <button
+                                        key={pageNum}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                        className={`px-3 py-1 text-sm font-medium rounded-md ${
+                                            currentPage === pageNum
+                                                ? 'bg-blue-500 text-white'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        {pageNum}
+                                    </button>
+                                );
+                            })}
 
-                            <div className="flex space-x-1">
-                                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                    const page = i + 1;
-                                    return (
-                                        <button
-                                            key={page}
-                                            onClick={() => setCurrentPage(page)}
-                                            className={`px-3 py-1 rounded-md text-sm font-medium ${
-                                                currentPage === page
-                                                    ? 'bg-blue-500 text-white'
-                                                    : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-                                            }`}
-                                        >
-                                            {page}
-                                        </button>
-                                    );
-                                })}
-                            </div>
-
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                                disabled={currentPage === totalPages}
-                                className="px-3 py-1 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                Sau
-                            </button>
+                            {totalPages > 5 && (
+                                <>
+                                    <span className="text-gray-400">...</span>
+                                    <button
+                                        onClick={() => setCurrentPage(totalPages)}
+                                        className={`px-3 py-1 text-sm font-medium rounded-md ${
+                                            currentPage === totalPages
+                                                ? 'bg-blue-500 text-white'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                    >
+                                        {totalPages}
+                                    </button>
+                                </>
+                            )}
                         </div>
+
+                        <button
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            disabled={currentPage === totalPages}
+                            className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <span>Trang sau</span>
+                            <span>→</span>
+                        </button>
                     </div>
                 </div>
             )}
