@@ -7,10 +7,10 @@
     },
     "provinces": [
         {
-            "name": "An Giang",
+            "name": "Tỉnh An Giang",
             "oldNames": [
-                "An Giang",
-                "Kiên Giang"
+                "Tỉnh An Giang",
+                "Tỉnh Kiên Giang"
             ],
             "type": "province",
             "communes": [
@@ -914,10 +914,10 @@
             ]
         },
         {
-            "name": "Bắc Ninh",
+            "name": "Tỉnh Bắc Ninh",
             "oldNames": [
-                "Bắc Ninh",
-                "Bắc Giang"
+                "Tỉnh Bắc Ninh",
+                "Tỉnh Bắc Giang"
             ],
             "type": "province",
             "communes": [
@@ -1829,9 +1829,9 @@
             ]
         },
         {
-            "name": "Cao Bằng",
+            "name": "Tỉnh Cao Bằng",
             "oldNames": [
-                "Cao Bằng"
+                "Tỉnh Cao Bằng"
             ],
             "type": "province",
             "communes": [
@@ -2334,10 +2334,10 @@
             ]
         },
         {
-            "name": "Cà Mau",
+            "name": "Tỉnh Cà Mau",
             "oldNames": [
-                "Bạc Liêu",
-                "Cà Mau"
+                "Tỉnh Bạc Liêu",
+                "Tỉnh Cà Mau"
             ],
             "type": "province",
             "communes": [
@@ -2908,11 +2908,11 @@
             ]
         },
         {
-            "name": "Cần Thơ",
+            "name": "Thành phố Cần Thơ",
             "oldNames": [
-                "Cần Thơ",
-                "Sóc Trăng",
-                "Hậu Giang"
+                "Thành phố Cần Thơ",
+                "Tỉnh Sóc Trăng",
+                "Tỉnh Hậu Giang"
             ],
             "type": "province",
             "communes": [
@@ -3802,10 +3802,10 @@
             ]
         },
         {
-            "name": "Đà Nẵng",
+            "name": "Thành phố Đà Nẵng",
             "oldNames": [
-                "Quảng Nam",
-                "Đà Nẵng"
+                "Tỉnh Quảng Nam",
+                "Thành phố Đà Nẵng"
             ],
             "type": "province",
             "communes": [
@@ -4652,10 +4652,10 @@
             ]
         },
         {
-            "name": "Đắk Lắk",
+            "name": "Tỉnh Đắk Lắk",
             "oldNames": [
-                "ĐắK Lắk",
-                "Phú Yên"
+                "Tỉnh ĐắK Lắk",
+                "Tỉnh Phú Yên"
             ],
             "type": "province",
             "communes": [
@@ -5562,9 +5562,9 @@
             ]
         },
         {
-            "name": "Điện Biên",
+            "name": "Tỉnh Điện Biên",
             "oldNames": [
-                "Điện Biên"
+                "Tỉnh Điện Biên"
             ],
             "type": "province",
             "communes": [
@@ -5968,10 +5968,10 @@
             ]
         },
         {
-            "name": "Đồng Nai",
+            "name": "Tỉnh Đồng Nai",
             "oldNames": [
-                "Đồng Nai",
-                "Bình Phước"
+                "Tỉnh Đồng Nai",
+                "Tỉnh Bình Phước"
             ],
             "type": "province",
             "communes": [
@@ -6813,10 +6813,10 @@
             ]
         },
         {
-            "name": "Đồng Tháp",
+            "name": "Tỉnh Đồng Tháp",
             "oldNames": [
-                "Vĩnh Long",
-                "Đồng Tháp"
+                "Tỉnh Vĩnh Long",
+                "Tỉnh Đồng Tháp"
             ],
             "type": "province",
             "communes": [
@@ -7733,10 +7733,10 @@
             ]
         },
         {
-            "name": "Gia Lai",
+            "name": "Tỉnh Gia Lai",
             "oldNames": [
-                "Gia Lai",
-                "Bình Định"
+                "Tỉnh Gia Lai",
+                "Tỉnh Bình Định"
             ],
             "type": "province",
             "communes": [
@@ -8922,9 +8922,9 @@
             ]
         },
         {
-            "name": "Hà Nội",
+            "name": "Thành phố Hà Nội",
             "oldNames": [
-                "Hà Nội"
+                "Thành phố Hà Nội"
             ],
             "type": "province",
             "communes": [
@@ -10442,9 +10442,9 @@
             ]
         },
         {
-            "name": "Hà Tĩnh",
+            "name": "Tỉnh Hà Tĩnh",
             "oldNames": [
-                "Hà Tĩnh"
+                "Tỉnh Hà Tĩnh"
             ],
             "type": "province",
             "communes": [
@@ -11072,10 +11072,10 @@
             ]
         },
         {
-            "name": "Hải Phòng",
+            "name": "Thành phố Hải Phòng",
             "oldNames": [
-                "Hải Phòng",
-                "Hải Dương"
+                "Thành phố Hải Phòng",
+                "Tỉnh Hải Dương"
             ],
             "type": "province",
             "communes": [
@@ -12183,9 +12183,9 @@
             ]
         },
         {
-            "name": "Huế",
+            "name": "Thành phố Huế",
             "oldNames": [
-                "Huế"
+                "Thành phố Huế"
             ],
             "type": "province",
             "communes": [
@@ -12561,10 +12561,10 @@
             ]
         },
         {
-            "name": "Hưng Yên",
+            "name": "Tỉnh Hưng Yên",
             "oldNames": [
-                "Hưng Yên",
-                "Thái Bình"
+                "Tỉnh Hưng Yên",
+                "Tỉnh Thái Bình"
             ],
             "type": "province",
             "communes": [
@@ -13563,10 +13563,10 @@
             ]
         },
         {
-            "name": "Khánh Hòa",
+            "name": "Tỉnh Khánh Hòa",
             "oldNames": [
-                "Ninh Thuận",
-                "Khánh Hòa"
+                "Tỉnh Ninh Thuận",
+                "Tỉnh Khánh Hòa"
             ],
             "type": "province",
             "communes": [
@@ -14155,9 +14155,9 @@
             ]
         },
         {
-            "name": "Lai Châu",
+            "name": "Tỉnh Lai Châu",
             "oldNames": [
-                "Lai Châu"
+                "Tỉnh Lai Châu"
             ],
             "type": "province",
             "communes": [
@@ -14497,9 +14497,9 @@
             ]
         },
         {
-            "name": "Lạng Sơn",
+            "name": "Tỉnh Lạng Sơn",
             "oldNames": [
-                "Lạng Sơn"
+                "Tỉnh Lạng Sơn"
             ],
             "type": "province",
             "communes": [
@@ -15090,10 +15090,10 @@
             ]
         },
         {
-            "name": "Lào Cai",
+            "name": "Tỉnh Lào Cai",
             "oldNames": [
-                "Lào Cai",
-                "Yên Bái"
+                "Tỉnh Lào Cai",
+                "Tỉnh Yên Bái"
             ],
             "type": "province",
             "communes": [
@@ -16002,11 +16002,11 @@
             ]
         },
         {
-            "name": "Lâm Đồng",
+            "name": "Tỉnh Lâm Đồng",
             "oldNames": [
-                "Lâm Đồng",
-                "Đắk Nông",
-                "Bình Thuận"
+                "Tỉnh Lâm Đồng",
+                "Tỉnh Đắk Nông",
+                "Tỉnh Bình Thuận"
             ],
             "type": "province",
             "communes": [
@@ -17086,9 +17086,9 @@
             ]
         },
         {
-            "name": "Nghệ An",
+            "name": "Tỉnh Nghệ An",
             "oldNames": [
-                "Nghệ An"
+                "Tỉnh Nghệ An"
             ],
             "type": "province",
             "communes": [
@@ -18273,11 +18273,11 @@
             ]
         },
         {
-            "name": "Ninh Bình",
+            "name": "Tỉnh Ninh Bình",
             "oldNames": [
-                "Ninh Bình",
-                "Nam Định",
-                "Hà Nam"
+                "Tỉnh Ninh Bình",
+                "Tỉnh Nam Định",
+                "Tỉnh Hà Nam"
             ],
             "type": "province",
             "communes": [
@@ -19454,11 +19454,11 @@
             ]
         },
         {
-            "name": "Phú Thọ",
+            "name": "Tỉnh Phú Thọ",
             "oldNames": [
-                "Vĩnh Phức",
-                "Phú Thọ",
-                "Hòa Bình"
+                "Tỉnh Vĩnh Phức",
+                "Tỉnh Phú Thọ",
+                "Tỉnh Hòa Bình"
             ],
             "type": "province",
             "communes": [
@@ -20829,10 +20829,10 @@
             ]
         },
         {
-            "name": "Quảng Ngãi",
+            "name": "Tỉnh Quảng Ngãi",
             "oldNames": [
-                "Kon Tum",
-                "Quảng Ngãi"
+                "Tỉnh Kon Tum",
+                "Tỉnh Quảng Ngãi"
             ],
             "type": "province",
             "communes": [
@@ -21684,9 +21684,9 @@
             ]
         },
         {
-            "name": "Quảng Ninh",
+            "name": "Tỉnh Quảng Ninh",
             "oldNames": [
-                "Quảng Ninh"
+                "Tỉnh Quảng Ninh"
             ],
             "type": "province",
             "communes": [
@@ -22191,10 +22191,10 @@
             ]
         },
         {
-            "name": "Quảng Trị",
+            "name": "Tỉnh Quảng Trị",
             "oldNames": [
-                "Quảng Bình",
-                "Quảng Trị"
+                "Tỉnh Quảng Bình",
+                "Tỉnh Quảng Trị"
             ],
             "type": "province",
             "communes": [
@@ -22931,9 +22931,9 @@
             ]
         },
         {
-            "name": "Sơn La",
+            "name": "Tỉnh Sơn La",
             "oldNames": [
-                "Sơn La"
+                "Tỉnh Sơn La"
             ],
             "type": "province",
             "communes": [
@@ -23588,10 +23588,10 @@
             ]
         },
         {
-            "name": "Tây Ninh",
+            "name": "Tỉnh Tây Ninh",
             "oldNames": [
-                "Tây Ninh",
-                "Long An"
+                "Tỉnh Tây Ninh",
+                "Tỉnh Long An"
             ],
             "type": "province",
             "communes": [
@@ -24467,10 +24467,10 @@
             ]
         },
         {
-            "name": "Thái Nguyên",
+            "name": "Tỉnh Thái Nguyên",
             "oldNames": [
-                "Thái Nguyên",
-                "Bắc Kạn"
+                "Tỉnh Thái Nguyên",
+                "Tỉnh Bắc Kạn"
             ],
             "type": "province",
             "communes": [
@@ -25302,9 +25302,9 @@
             ]
         },
         {
-            "name": "Thanh Hóa",
+            "name": "Tỉnh Thanh Hóa",
             "oldNames": [
-                "Thanh Hóa"
+                "Tỉnh Thanh Hóa"
             ],
             "type": "province",
             "communes": [
@@ -26837,11 +26837,11 @@
             ]
         },
         {
-            "name": "TP HCM",
+            "name": "Tỉnh TP HCM",
             "oldNames": [
-                "Bà Rịa - Vũng Tàu",
-                "Bình Dương",
-                "TP HCM"
+                "Tỉnh Bà Rịa - Vũng Tàu",
+                "Tỉnh Bình Dương",
+                "Tỉnh TP HCM"
             ],
             "type": "province",
             "communes": [
@@ -28340,10 +28340,10 @@
             ]
         },
         {
-            "name": "Tuyên Quang",
+            "name": "Tỉnh Tuyên Quang",
             "oldNames": [
-                "Tuyên Quang",
-                "Hà Giang"
+                "Tỉnh Tuyên Quang",
+                "Tỉnh Hà Giang"
             ],
             "type": "province",
             "communes": [
@@ -29425,11 +29425,11 @@
             ]
         },
         {
-            "name": "Vĩnh Long",
+            "name": "Tỉnh Vĩnh Long",
             "oldNames": [
-                "Bến Tre",
-                "Vĩnh Long",
-                "Trà Vinh"
+                "Tỉnh Bến Tre",
+                "Tỉnh Vĩnh Long",
+                "Tỉnh Trà Vinh"
             ],
             "type": "province",
             "communes": [
