@@ -1,0 +1,172 @@
+{
+    "VN-AG": {
+        "name": "An Giang",
+        "originalProvinces": ["An Giang", "Kiên Giang"],
+        "description": "An Giang và Kiên Giang được sáp nhập thành tỉnh An Giang mới"
+    },
+    "VN-BN": {
+        "name": "Bắc Ninh",
+        "originalProvinces": ["Bắc Ninh", "Bắc Giang"],
+        "description": "Bắc Ninh và Bắc Giang được sáp nhập thành tỉnh Bắc Ninh mới"
+    },
+    "VN-CB": {
+        "name": "Cao Bằng",
+        "originalProvinces": ["Cao Bằng"],
+        "description": "Cao Bằng giữ nguyên không sáp nhập"
+    },
+    "VN-CM": {
+        "name": "Cà Mau",
+        "originalProvinces": ["Bạc Liêu", "Cà Mau"],
+        "description": "Bạc Liêu và Cà Mau được sáp nhập thành tỉnh Cà Mau mới"
+    },
+    "VN-CT": {
+        "name": "Cần Thơ",
+        "originalProvinces": ["Cần Thơ", "Sóc Trăng", "Hậu Giang"],
+        "description": "Cần Thơ, Sóc Trăng và Hậu Giang được sáp nhập thành thành phố Cần Thơ mới"
+    },
+    "VN-DN": {
+        "name": "Đà Nẵng",
+        "originalProvinces": ["Quảng Nam", "Đà Nẵng"],
+        "description": "Quảng Nam và Đà Nẵng được sáp nhập thành thành phố Đà Nẵng mới"
+    },
+    "VN-DL": {
+        "name": "Đắk Lắk",
+        "originalProvinces": ["Đắk Lắk", "Phú Yên"],
+        "description": "Đắk Lắk và Phú Yên được sáp nhập thành tỉnh Đắk Lắk mới"
+    },
+    "VN-DB": {
+        "name": "Điện Biên",
+        "originalProvinces": ["Điện Biên"],
+        "description": "Điện Biên giữ nguyên không sáp nhập"
+    },
+    "VN-DO": {
+        "name": "Đồng Nai",
+        "originalProvinces": ["Bình Phước"],
+        "description": "Bình Phước được sáp nhập vào tỉnh Đồng Nai mới"
+    },
+    "VN-DT": {
+        "name": "Đồng Tháp",
+        "originalProvinces": ["Vĩnh Long", "Đồng Tháp"],
+        "description": "Vĩnh Long và Đồng Tháp được sáp nhập thành tỉnh Đồng Tháp mới"
+    },
+    "VN-GL": {
+        "name": "Gia Lai",
+        "originalProvinces": ["Gia Lai", "Bình Định"],
+        "description": "Gia Lai và Bình Định được sáp nhập thành tỉnh Gia Lai mới"
+    },
+    "VN-HN": {
+        "name": "Hà Nội",
+        "originalProvinces": ["Hà Nội"],
+        "description": "Hà Nội giữ nguyên không sáp nhập"
+    },
+    "VN-HT": {
+        "name": "Hà Tĩnh",
+        "originalProvinces": ["Hà Tĩnh"],
+        "description": "Hà Tĩnh giữ nguyên không sáp nhập"
+    },
+    "VN-HP": {
+        "name": "Hải Phòng",
+        "originalProvinces": ["Hải Phòng", "Hải Dương"],
+        "description": "Hải Phòng và Hải Dương được sáp nhập thành thành phố Hải Phòng mới"
+    },
+    "VN-HU": {
+        "name": "Huế",
+        "originalProvinces": ["Thừa Thiên - Huế"],
+        "description": "Thừa Thiên - Huế được đổi tên thành Huế"
+    },
+    "VN-HY": {
+        "name": "Hưng Yên",
+        "originalProvinces": ["Thái Bình"],
+        "description": "Thái Bình được sáp nhập vào tỉnh Hưng Yên mới"
+    },
+    "VN-KH": {
+        "name": "Khánh Hòa",
+        "originalProvinces": ["Ninh Thuận", "Khánh Hòa"],
+        "description": "Ninh Thuận và Khánh Hòa được sáp nhập thành tỉnh Khánh Hòa mới"
+    },
+    "VN-LC": {
+        "name": "Lai Châu",
+        "originalProvinces": ["Lai Châu"],
+        "description": "Lai Châu giữ nguyên không sáp nhập"
+    },
+    "VN-LS": {
+        "name": "Lạng Sơn",
+        "originalProvinces": ["Lạng Sơn"],
+        "description": "Lạng Sơn giữ nguyên không sáp nhập"
+    },
+    "VN-LA": {
+        "name": "Lào Cai",
+        "originalProvinces": ["Lào Cai", "Yên Bái"],
+        "description": "Lào Cai và Yên Bái được sáp nhập thành tỉnh Lào Cai mới"
+    },
+    "VN-LD": {
+        "name": "Lâm Đồng",
+        "originalProvinces": ["Lâm Đồng", "Đắk Nông", "Bình Thuận"],
+        "description": "Lâm Đồng, Đắk Nông và Bình Thuận được sáp nhập thành tỉnh Lâm Đồng mới"
+    },
+    "VN-NA": {
+        "name": "Nghệ An",
+        "originalProvinces": ["Nghệ An"],
+        "description": "Nghệ An giữ nguyên không sáp nhập"
+    },
+    "VN-NB": {
+        "name": "Ninh Bình",
+        "originalProvinces": ["Ninh Bình", "Nam Định", "Hà Nam"],
+        "description": "Ninh Bình, Nam Định và Hà Nam được sáp nhập thành tỉnh Ninh Bình mới"
+    },
+    "VN-PT": {
+        "name": "Phú Thọ",
+        "originalProvinces": ["Vĩnh Phúc", "Phú Thọ", "Hòa Bình"],
+        "description": "Vĩnh Phúc, Phú Thọ và Hòa Bình được sáp nhập thành tỉnh Phú Thọ mới"
+    },
+    "VN-QN": {
+        "name": "Quảng Ngãi",
+        "originalProvinces": ["Kon Tum", "Quảng Ngãi"],
+        "description": "Kon Tum và Quảng Ngãi được sáp nhập thành tỉnh Quảng Ngãi mới"
+    },
+    "VN-QI": {
+        "name": "Quảng Ninh",
+        "originalProvinces": ["Quảng Ninh"],
+        "description": "Quảng Ninh giữ nguyên không sáp nhập"
+    },
+    "VN-QT": {
+        "name": "Quảng Trị",
+        "originalProvinces": ["Quảng Bình", "Quảng Trị"],
+        "description": "Quảng Bình và Quảng Trị được sáp nhập thành tỉnh Quảng Trị mới"
+    },
+    "VN-SL": {
+        "name": "Sơn La",
+        "originalProvinces": ["Sơn La"],
+        "description": "Sơn La giữ nguyên không sáp nhập"
+    },
+    "VN-TN": {
+        "name": "Tây Ninh",
+        "originalProvinces": ["Tây Ninh", "Long An"],
+        "description": "Tây Ninh và Long An được sáp nhập thành tỉnh Tây Ninh mới"
+    },
+    "VN-TG": {
+        "name": "Thái Nguyên",
+        "originalProvinces": ["Thái Nguyên"],
+        "description": "Thái Nguyên giữ nguyên không sáp nhập"
+    },
+    "VN-TH": {
+        "name": "Thanh Hóa",
+        "originalProvinces": ["Thanh Hóa"],
+        "description": "Thanh Hóa giữ nguyên không sáp nhập"
+    },
+    "VN-SG": {
+        "name": "TP HCM",
+        "originalProvinces": ["Bà Rịa - Vũng Tàu", "Bình Dương", "Hồ Chí Minh"],
+        "description": "Bà Rịa - Vũng Tàu, Bình Dương và TP HCM được sáp nhập thành thành phố HCM mới"
+    },
+    "VN-TQ": {
+        "name": "Tuyên Quang",
+        "originalProvinces": ["Tuyên Quang", "Hà Giang"],
+        "description": "Tuyên Quang và Hà Giang được sáp nhập thành tỉnh Tuyên Quang mới"
+    },
+    "VN-VL": {
+        "name": "Vĩnh Long",
+        "originalProvinces": ["Bến Tre", "Tiền Giang", "Trà Vinh"],
+        "description": "Bến Tre, Tiền Giang và Trà Vinh được sáp nhập thành tỉnh Vĩnh Long mới"
+    }
+}
