@@ -2,6 +2,7 @@ import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 
 interface MapDisplayProps {
     title: string;
+    subtitle?: string; // Thêm subtitle cho thông tin chi tiết
     count: number;
     backgroundColor: string;
     onProvinceHover: (element: SVGElement, mapType: 'before' | 'merged') => void;
@@ -17,6 +18,7 @@ export interface MapDisplayRef {
 
 const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                                                                    title,
+                                                                   subtitle,
                                                                    count,
                                                                    backgroundColor,
                                                                    onProvinceHover,
@@ -99,11 +101,18 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className={`${backgroundColor} text-white p-4 flex justify-between items-center`}>
-                <h2 className="text-xl font-bold">{title}</h2>
-                <span className={`${backgroundColor.replace('bg-', 'bg-').replace('500', '600')} px-3 py-1 rounded-full text-sm`}>
-                    {count} tỉnh thành
-                </span>
+            <div className={`${backgroundColor} text-white p-4`}>
+                <div className="flex justify-between items-start">
+                    <div className="flex-1">
+                        <div className="flex items-baseline">
+                            <h2 className="text-xl font-bold">{title}</h2>
+                            {subtitle && <p className="text-sm opacity-90 leading-relaxed ml-2">({subtitle})</p>}
+                        </div>
+                    </div>
+                    <span className={`${backgroundColor.replace('bg-', 'bg-').replace('500', '600')} px-3 py-1 rounded-full text-sm flex-shrink-0`}>
+                        {count} tỉnh thành
+                    </span>
+                </div>
             </div>
             <div className="p-4">
                 <div

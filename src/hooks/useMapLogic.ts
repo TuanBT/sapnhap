@@ -32,6 +32,10 @@ export const useMapLogic = ({
     const [description, setDescription] = useState('');
     const [isActive, setIsActive] = useState(false);
 
+    // Thêm 2 state mới để lưu thông tin chi tiết
+    const [currentHoveredProvince, setCurrentHoveredProvince] = useState('');
+    const [allRelatedProvinces, setAllRelatedProvinces] = useState('');
+
     // Fallback refs nếu không được truyền từ ngoài
     const fallbackBeforeMapRef = useRef<HTMLDivElement>(null);
     const fallbackMergedMapRef = useRef<HTMLDivElement>(null);
@@ -140,10 +144,13 @@ export const useMapLogic = ({
         let mergedName = '';
         let related: string[] = [];
         let desc = '';
+        let hoveredProvince = '';
+        let allRelated = '';
 
         if (mapType === 'before') {
             // Từ bản đồ hiện tại (63 tỉnh)
             const beforeProvinceName = provinces[provinceId] || provinceId;
+            hoveredProvince = beforeProvinceName; // Tỉnh đang hover
             console.log(`Before province name: ${beforeProvinceName}`);
 
             const mappedId = provinceMapping[provinceId];
@@ -156,10 +163,12 @@ export const useMapLogic = ({
                 const info = mergeInfo[mappedId];
                 if (info) {
                     beforeName = info.originalProvinces.join(', ');
+                    allRelated = info.originalProvinces.join(', '); // Tất cả tỉnh liên quan
                     desc = info.description || `${beforeProvinceName} được sáp nhập vào ${mergedName}`;
                     related = info.originalProvinces;
                 } else {
                     beforeName = beforeProvinceName;
+                    allRelated = beforeProvinceName;
                     desc = `${beforeProvinceName} được sáp nhập vào ${mergedName}`;
                     related = [beforeProvinceName];
                 }
@@ -167,21 +176,25 @@ export const useMapLogic = ({
                 // Tỉnh không được sáp nhập hoặc không tìm thấy mapping
                 beforeName = beforeProvinceName;
                 mergedName = beforeProvinceName;
+                allRelated = beforeProvinceName;
                 desc = `${beforeProvinceName} không được sáp nhập hoặc không có thông tin`;
                 related = [beforeProvinceName];
             }
         } else {
             // Từ bản đồ sau sáp nhập (34 tỉnh)
             mergedName = provincesMerged[provinceId] || provinceId;
+            hoveredProvince = mergedName; // Tỉnh đang hover
             console.log(`Merged province name: ${mergedName}`);
 
             const info = mergeInfo[provinceId];
             if (info && info.originalProvinces) {
                 beforeName = info.originalProvinces.join(', ');
+                allRelated = info.originalProvinces.join(', '); // Tất cả tỉnh gốc
                 related = info.originalProvinces;
                 desc = info.description || `${mergedName} được tạo thành từ việc sáp nhập ${info.originalProvinces.join(', ')}`;
             } else {
                 beforeName = mergedName;
+                allRelated = mergedName;
                 related = [mergedName];
                 desc = `${mergedName} không có thông tin sáp nhập`;
             }
@@ -190,6 +203,8 @@ export const useMapLogic = ({
         console.log('Final result:', {
             beforeName,
             mergedName,
+            hoveredProvince,
+            allRelated,
             related,
             desc
         });
@@ -197,6 +212,8 @@ export const useMapLogic = ({
         // Cập nhật state
         setBeforeProvinceName(beforeName);
         setMergedProvinceName(mergedName);
+        setCurrentHoveredProvince(hoveredProvince);
+        setAllRelatedProvinces(allRelated);
         setRelatedProvinces(related);
         setDescription(desc);
         setIsActive(true);
@@ -218,6 +235,8 @@ export const useMapLogic = ({
         setIsActive(false);
         setBeforeProvinceName('Tên tỉnh trước sáp nhập');
         setMergedProvinceName('Tên tỉnh sau sáp nhập');
+        setCurrentHoveredProvince('');
+        setAllRelatedProvinces('');
         setRelatedProvinces([]);
         setDescription('');
     }, []);
@@ -225,6 +244,8 @@ export const useMapLogic = ({
     return {
         beforeProvinceName,
         mergedProvinceName,
+        currentHoveredProvince,
+        allRelatedProvinces,
         relatedProvinces,
         description,
         isActive,

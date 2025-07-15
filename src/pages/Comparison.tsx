@@ -4,7 +4,6 @@ import { useMapLogic } from '../hooks/useMapLogic';
 import { SVGMerger } from '../utils/svgMerger';
 import MapDisplay, { type MapDisplayRef } from '../components/MapDisplay';
 import Header from '../components/Header';
-import InfoPanel from '../components/InfoPanel';
 
 const Comparison: React.FC = () => {
     const { provinces, provincesMerged, provinceMapping, mergeInfo, loading, error } = useProvinceData();
@@ -16,7 +15,8 @@ const Comparison: React.FC = () => {
     const {
         beforeProvinceName,
         mergedProvinceName,
-        isActive,
+        currentHoveredProvince,
+        allRelatedProvinces,
         handleProvinceHover,
         handleProvinceLeave
     } = useMapLogic({
@@ -75,18 +75,14 @@ const Comparison: React.FC = () => {
             <Header />
 
             <div className="container mx-auto px-4 pb-8 pt-3">
-                {/* Info Panel */}
-                <InfoPanel
-                    beforeProvinceName={beforeProvinceName}
-                    mergedProvinceName={mergedProvinceName}
-                    isActive={isActive}
-                />
-
                 {/* Maps */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <MapDisplay
                         ref={beforeMapRef}
-                        title={beforeProvinceName}
+                        title={currentHoveredProvince || beforeProvinceName}
+                        subtitle={currentHoveredProvince && allRelatedProvinces !== currentHoveredProvince
+                            ? `Thuộc nhóm: ${allRelatedProvinces}`
+                            : ''}
                         count={provinces ? Object.keys(provinces).length : 0}
                         backgroundColor="bg-blue-500"
                         onProvinceHover={handleProvinceHover}
@@ -97,7 +93,10 @@ const Comparison: React.FC = () => {
 
                     <MapDisplay
                         ref={mergedMapRef}
-                        title={mergedProvinceName}
+                        title={currentHoveredProvince || mergedProvinceName}
+                        subtitle={currentHoveredProvince && allRelatedProvinces !== currentHoveredProvince
+                            ? `Gộp từ: ${allRelatedProvinces}`
+                            : ''}
                         count={provincesMerged ? Object.keys(provincesMerged).length : 0}
                         backgroundColor="bg-green-500"
                         onProvinceHover={handleProvinceHover}
