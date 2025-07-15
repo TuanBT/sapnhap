@@ -200,8 +200,8 @@ export const useMapLogic = ({
 
         // Reset state
         setIsActive(false);
-        setCurrentProvinceName('Hover vào bản đồ');
-        setMergedProvinceName('Hover vào bản đồ');
+        setCurrentProvinceName('Di chuột vào bản đồ');
+        setMergedProvinceName('Di chuột vào bản đồ');
         setRelatedProvinces([]);
         setDescription('');
     }, []);

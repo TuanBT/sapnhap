@@ -1,21 +1,17 @@
 
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt, faArrowRight, faInfo } from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkerAlt, faArrowRight } from '@fortawesome/free-solid-svg-icons';
 
 interface InfoPanelProps {
     currentProvinceName: string;
     mergedProvinceName: string;
-    description?: string; // Làm optional
-    relatedProvinces: string[];
     isActive: boolean;
 }
 
 const InfoPanel: React.FC<InfoPanelProps> = ({
                                                  currentProvinceName,
                                                  mergedProvinceName,
-                                                 description,
-                                                 relatedProvinces,
                                                  isActive
                                              }) => {
     return (
@@ -53,41 +49,6 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
                     `}>
                         {mergedProvinceName}
                     </div>
-                </div>
-            </div>
-
-            {/* Description - chỉ hiển thị khi có description */}
-            {description && (
-                <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500 mb-4">
-                    <div className="font-semibold text-yellow-800 mb-2">
-                        <FontAwesomeIcon icon={faInfo} className="mr-2" />
-                        Thông tin sáp nhập:
-                    </div>
-                    <p className="text-yellow-700">{description}</p>
-                </div>
-            )}
-
-            {/* Related Provinces */}
-            <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
-                <div className="font-semibold text-gray-800 text-lg mb-2">
-                    <FontAwesomeIcon icon={faInfo} className="mr-2" />
-                    Các tỉnh liên quan:
-                </div>
-                <div className="text-gray-600 leading-relaxed">
-                    {relatedProvinces.length > 0 ? (
-                        <div className="flex flex-wrap gap-2">
-                            {relatedProvinces.map((province, index) => (
-                                <span
-                                    key={index}
-                                    className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-sm border border-blue-300"
-                                >
-                                    {province}
-                                </span>
-                            ))}
-                        </div>
-                    ) : (
-                        'Chưa có thông tin'
-                    )}
                 </div>
             </div>
         </div>

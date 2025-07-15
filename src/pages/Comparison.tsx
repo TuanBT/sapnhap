@@ -16,8 +16,6 @@ const Comparison: React.FC = () => {
     const {
         currentProvinceName,
         mergedProvinceName,
-        relatedProvinces,
-        description,
         isActive,
         handleProvinceHover,
         handleProvinceLeave
@@ -107,8 +105,6 @@ const Comparison: React.FC = () => {
                 <InfoPanel
                     currentProvinceName={currentProvinceName}
                     mergedProvinceName={mergedProvinceName}
-                    description={description}
-                    relatedProvinces={relatedProvinces}
                     isActive={isActive}
                 />
             </div>
