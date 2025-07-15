@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faArrowRight, faInfo } from '@fortawesome/free-solid-svg-icons';
@@ -5,6 +6,7 @@ import { faMapMarkerAlt, faArrowRight, faInfo } from '@fortawesome/free-solid-sv
 interface InfoPanelProps {
     currentProvinceName: string;
     mergedProvinceName: string;
+    description?: string; // Làm optional
     relatedProvinces: string[];
     isActive: boolean;
 }
@@ -12,23 +14,24 @@ interface InfoPanelProps {
 const InfoPanel: React.FC<InfoPanelProps> = ({
                                                  currentProvinceName,
                                                  mergedProvinceName,
+                                                 description,
                                                  relatedProvinces,
                                                  isActive
                                              }) => {
     return (
-        <div className="bg-white mx-5 mb-5 rounded-lg shadow-lg p-6">
+        <div className="bg-white rounded-lg shadow-lg p-6">
             <div className="flex flex-col lg:flex-row items-center justify-between mb-5 gap-5">
                 <div className="flex-1 text-center">
                     <h3 className="text-blue-600 mb-2 text-lg font-semibold">
                         <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                        Tỉnh trước sáp nhập:
+                        Trước sáp nhập:
                     </h3>
                     <div className={`
-            text-2xl font-bold min-h-[60px] flex items-center justify-center p-3 
-            rounded-lg transition-all duration-300 bg-blue-50 text-blue-700 
-            border-2 border-blue-500 
-            ${isActive ? 'shadow-lg' : ''}
-          `}>
+                        text-lg font-bold min-h-[60px] flex items-center justify-center p-3 
+                        rounded-lg transition-all duration-300 bg-blue-50 text-blue-700 
+                        border-2 border-blue-500 
+                        ${isActive ? 'shadow-lg' : ''}
+                    `}>
                         {currentProvinceName}
                     </div>
                 </div>
@@ -40,20 +43,32 @@ const InfoPanel: React.FC<InfoPanelProps> = ({
                 <div className="flex-1 text-center">
                     <h3 className="text-green-600 mb-2 text-lg font-semibold">
                         <FontAwesomeIcon icon={faMapMarkerAlt} className="mr-2" />
-                        Hiện tại:
+                        Sau sáp nhập:
                     </h3>
                     <div className={`
-            text-2xl font-bold min-h-[60px] flex items-center justify-center p-3 
-            rounded-lg transition-all duration-300 bg-green-50 text-green-700 
-            border-2 border-green-500 
-            ${isActive ? 'shadow-lg' : ''}
-          `}>
+                        text-lg font-bold min-h-[60px] flex items-center justify-center p-3 
+                        rounded-lg transition-all duration-300 bg-green-50 text-green-700 
+                        border-2 border-green-500 
+                        ${isActive ? 'shadow-lg' : ''}
+                    `}>
                         {mergedProvinceName}
                     </div>
                 </div>
             </div>
 
-            <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-yellow-500">
+            {/* Description - chỉ hiển thị khi có description */}
+            {description && (
+                <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500 mb-4">
+                    <div className="font-semibold text-yellow-800 mb-2">
+                        <FontAwesomeIcon icon={faInfo} className="mr-2" />
+                        Thông tin sáp nhập:
+                    </div>
+                    <p className="text-yellow-700">{description}</p>
+                </div>
+            )}
+
+            {/* Related Provinces */}
+            <div className="bg-gray-50 p-4 rounded-lg border-l-4 border-blue-500">
                 <div className="font-semibold text-gray-800 text-lg mb-2">
                     <FontAwesomeIcon icon={faInfo} className="mr-2" />
                     Các tỉnh liên quan:

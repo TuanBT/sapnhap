@@ -17,6 +17,7 @@ const Home: React.FC = () => {
     const [mergedProvinceName, setMergedProvinceName] = useState('Chọn tỉnh để xem thông tin');
     const [relatedProvinces, setRelatedProvinces] = useState<string[]>([]);
     const [isActive, setIsActive] = useState(false);
+    const [description, setDescription] = useState('');
 
     // Khởi tạo search index khi dữ liệu đã load
     useEffect(() => {
@@ -62,6 +63,7 @@ const Home: React.FC = () => {
         setSelectedProvince(result.newName);
         setCurrentProvinceName(result.oldName || result.newName);
         setMergedProvinceName(result.newName);
+        setDescription(`Thông tin về ${result.newName}`);
         setIsActive(true);
 
         // Tìm các tỉnh liên quan
@@ -86,6 +88,7 @@ const Home: React.FC = () => {
         setCurrentProvinceName('Chọn tỉnh để xem thông tin');
         setMergedProvinceName('Chọn tỉnh để xem thông tin');
         setRelatedProvinces([]);
+        setDescription('');
         setIsActive(false);
     };
 
@@ -226,6 +229,7 @@ const Home: React.FC = () => {
             <InfoPanel
                 currentProvinceName={currentProvinceName}
                 mergedProvinceName={mergedProvinceName}
+                description={description}
                 relatedProvinces={relatedProvinces}
                 isActive={isActive}
             />
