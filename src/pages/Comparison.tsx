@@ -81,7 +81,7 @@ const Comparison: React.FC = () => {
                         ref={beforeMapRef}
                         title={currentHoveredProvince || beforeProvinceName}
                         subtitle={currentHoveredProvince && allRelatedProvinces !== currentHoveredProvince
-                            ? `Thuộc nhóm: ${allRelatedProvinces}`
+                            ? `${allRelatedProvinces}`
                             : ''}
                         count={provinces ? Object.keys(provinces).length : 0}
                         backgroundColor="bg-blue-500"
@@ -95,7 +95,7 @@ const Comparison: React.FC = () => {
                         ref={mergedMapRef}
                         title={currentHoveredProvince || mergedProvinceName}
                         subtitle={currentHoveredProvince && allRelatedProvinces !== currentHoveredProvince
-                            ? `Gộp từ: ${allRelatedProvinces}`
+                            ? `${allRelatedProvinces}`
                             : ''}
                         count={provincesMerged ? Object.keys(provincesMerged).length : 0}
                         backgroundColor="bg-green-500"
