@@ -1,3 +1,4 @@
+
 import React, { useState, useMemo, memo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -11,6 +12,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import type { FlatSearchItem } from '../hooks/useSearchData';
 import type { AdministrativeUnit } from '../types/administrative';
+import { normalizeForSearch } from '../utils/searchUtils';
 
 interface SearchResultItemProps {
     item: FlatSearchItem;
@@ -36,6 +38,33 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
             );
         };
     }, []);
+
+    // Hàm sắp xếp oldUnits để đưa unit match lên đầu
+    const sortedOldUnits = useMemo(() => {
+        if (item.level !== 'commune' || !item.oldUnits || !searchQuery.trim()) {
+            return item.oldUnits || [];
+        }
+
+        const normalizedQuery = normalizeForSearch(searchQuery);
+        const oldUnits = [...item.oldUnits];
+
+        // Sắp xếp: units match lên đầu
+        oldUnits.sort((a, b) => {
+            const aText = normalizeForSearch(`${a.province} ${a.district} ${a.ward}`);
+            const bText = normalizeForSearch(`${b.province} ${b.district} ${b.ward}`);
+
+            const aMatches = aText.includes(normalizedQuery);
+            const bMatches = bText.includes(normalizedQuery);
+
+            if (aMatches && !bMatches) return -1;
+            if (!aMatches && bMatches) return 1;
+
+            // Nếu cả hai đều match hoặc đều không match, giữ nguyên thứ tự
+            return 0;
+        });
+
+        return oldUnits;
+    }, [item.oldUnits, item.level, searchQuery]);
 
     const getLevelConfig = (level: string) => {
         switch (level) {
@@ -144,7 +173,6 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
 
     // Commune result
     if (item.level === 'commune') {
-        const oldUnits = item.oldUnits || [];
         const newUnit = item.newUnit || { province: '', district: '', ward: '' };
 
         return (
@@ -159,7 +187,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
 
                     <div className="flex items-center space-x-3">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {oldUnits.length} → 1
+                            {sortedOldUnits.length} → 1
                         </span>
                         <button
                             onClick={() => setShowDetails(!showDetails)}
@@ -175,8 +203,8 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                     <div className="flex-1">
                         <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Trước sắp xếp</div>
                         <div className="space-y-2">
-                            {/* Chỉ hiển thị 1 đơn vị đầu tiên */}
-                            {oldUnits.slice(0, 1).map((unit: AdministrativeUnit, index: number) => (
+                            {/* Hiển thị 1 đơn vị đầu tiên (đã được sắp xếp để unit match lên đầu) */}
+                            {sortedOldUnits.slice(0, 1).map((unit: AdministrativeUnit, index: number) => (
                                 <div key={index} className="text-sm">
                                     <div className="font-medium text-gray-900 dark:text-white">
                                         {highlightText(unit.province, searchQuery)}
@@ -189,9 +217,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                 </div>
                             ))}
                             {/* Hiển thị "+x đơn vị khác" nếu có hơn 1 đơn vị */}
-                            {oldUnits.length > 1 && (
+                            {sortedOldUnits.length > 1 && (
                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                    +{oldUnits.length - 1} đơn vị khác
+                                    +{sortedOldUnits.length - 1} đơn vị khác
                                 </div>
                             )}
                         </div>
@@ -221,6 +249,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                     </div>
                 </div>
 
+                {/* CHI TIẾT - chỉ hiển thị khi click */}
                 {showDetails && (
                     <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                         <div className="space-y-4">
@@ -230,7 +259,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                     Tất cả các đơn vị trước sắp xếp
                                 </h4>
                                 <div className="space-y-2">
-                                    {oldUnits.map((unit: AdministrativeUnit, index: number) => (
+                                    {sortedOldUnits.map((unit: AdministrativeUnit, index: number) => (
                                         <div key={index} className="text-sm bg-gray-50 dark:bg-gray-700 rounded p-2">
                                             <div className="font-medium text-gray-900 dark:text-white">
                                                 {highlightText(unit.province, searchQuery)}
