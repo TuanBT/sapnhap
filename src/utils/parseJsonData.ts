@@ -1,3 +1,4 @@
+
 import type { SearchItem, CommuneSearchItem, ProvinceSearchItem, DistrictSearchItem, AdministrativeUnit } from '../types/administrative';
 
 // JSON structure from thongtinhanhchinh.json
@@ -34,7 +35,7 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
     const districtChanges = new Map<string, { oldProvince: string; newProvince: string; oldDistrict: string; newDistrict: string }>();
 
     // First pass: Create commune items and collect unique province/district changes
-    jsonData.changes.forEach((change) => {
+    jsonData.changes.forEach((change, index) => {
         const newUnit: AdministrativeUnit = {
             province: normalizeText(change.newUnit.province),
             district: change.newUnit.district,
@@ -73,12 +74,15 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
             }
         });
 
-        // Create commune item
-        const baseSearchText = [
+        // Create commune item với searchText đầy đủ
+        const allTextParts = [
             newUnit.province,
+            newUnit.district,
             newUnit.ward,
-            ...oldUnits.map(unit => `${unit.province} ${unit.district} ${unit.ward}`)
-        ].join(' ');
+            ...oldUnits.map(unit => [unit.province, unit.district, unit.ward].filter(p => p !== "∅").join(' '))
+        ].filter(part => part && part.trim());
+
+        const baseSearchText = allTextParts.join(' ');
 
         const communeItem: CommuneSearchItem = {
             id: change.id,
@@ -87,11 +91,22 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
             newUnit,
             oldUnits,
             document: change.document,
-            fullPath: `${newUnit.province} > ${newUnit.ward}`,
+            fullPath: `${newUnit.province} > ${newUnit.district} > ${newUnit.ward}`,
             searchText: baseSearchText
         };
 
         searchItems.push(communeItem);
+
+        // Debug: log mọi item có chứa "Tuy Hoà"
+        if (baseSearchText.includes('Tuy Hoà') || baseSearchText.includes('Tuy Hòa')) {
+            console.log(`Found Tuy Hoà item ${index}:`, {
+                id: change.id,
+                name: newUnit.ward,
+                searchText: baseSearchText,
+                newUnit,
+                oldUnits
+            });
+        }
     });
 
     // Second pass: Create unique province items
@@ -124,6 +139,11 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
             searchText: `${change.oldProvince} ${change.oldDistrict} ${change.newProvince} ${change.newDistrict}`
         };
         searchItems.push(districtItem);
+
+        // Debug: log mọi district có chứa "Tuy Hoà"
+        if (districtItem.searchText.includes('Tuy Hoà') || districtItem.searchText.includes('Tuy Hòa')) {
+            console.log(`Found Tuy Hoà district:`, districtItem);
+        }
     });
 
     console.log(`Generated ${searchItems.length} search items:`);

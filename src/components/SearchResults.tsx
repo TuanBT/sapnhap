@@ -10,39 +10,35 @@ interface SearchResultsProps {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) => {
-    // Detect administrative level from query
+    // Detect administrative level from query - CHỈ KHI CÓ PREFIX RÕ RÀNG
     const detectedLevel = useMemo(() => {
         const normalizedQuery = searchQuery.toLowerCase();
 
-        if (normalizedQuery.includes('tỉnh') || normalizedQuery.includes('thành phố') ||
-            normalizedQuery.includes('tinh') || normalizedQuery.includes('thanh pho')) {
+        // Chỉ detect level khi có prefix rõ ràng ở đầu
+        if (normalizedQuery.startsWith('tỉnh ') || normalizedQuery.startsWith('tinh ')) {
             return 'province';
         }
 
-        if (normalizedQuery.includes('quận') || normalizedQuery.includes('huyện') ||
-            normalizedQuery.includes('thị xã') || normalizedQuery.includes('quan') ||
-            normalizedQuery.includes('huyen') || normalizedQuery.includes('thi xa')) {
+        if (normalizedQuery.startsWith('quận ') || normalizedQuery.startsWith('huyện ') ||
+            normalizedQuery.startsWith('thị xã ') || normalizedQuery.startsWith('quan ') ||
+            normalizedQuery.startsWith('huyen ') || normalizedQuery.startsWith('thi xa ')) {
             return 'district';
         }
 
-        if (normalizedQuery.includes('xã') || normalizedQuery.includes('phường') ||
-            normalizedQuery.includes('thị trấn') || normalizedQuery.includes('xa') ||
-            normalizedQuery.includes('phuong') || normalizedQuery.includes('thi tran')) {
+        if (normalizedQuery.startsWith('xã ') || normalizedQuery.startsWith('phường ') ||
+            normalizedQuery.startsWith('thị trấn ') || normalizedQuery.startsWith('xa ') ||
+            normalizedQuery.startsWith('phuong ') || normalizedQuery.startsWith('thi tran ')) {
             return 'commune';
         }
 
+        // Không detect level nếu không có prefix rõ ràng
         return 'all';
     }, [searchQuery]);
 
-    // Filter results based on detected level
+    // KHÔNG filter results based on detected level - hiển thị tất cả kết quả
     const filteredResults = useMemo(() => {
-        if (detectedLevel === 'all') {
-            return results.slice(0, 50);
-        }
-
-        // Chỉ hiển thị kết quả đúng cấp
-        return results.filter(r => r.level === detectedLevel).slice(0, 20);
-    }, [results, detectedLevel]);
+        return results.slice(0, 100); // Tăng limit lên 100
+    }, [results]);
 
     const hasMoreResults = results.length > filteredResults.length;
 
@@ -53,14 +49,18 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
                 <h3 className="text-lg font-medium text-gray-700 mb-2">
                     Nhập từ khóa để tìm kiếm
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 mb-4">
                     Tìm kiếm theo tên tỉnh, huyện, phường/xã cũ hoặc mới
                 </p>
-                <div className="mt-4 text-sm text-gray-400">
-                    <p>💡 <strong>Mẹo:</strong> Sử dụng từ khóa cụ thể như:</p>
-                    <p>"<strong>Tỉnh Phú Yên</strong>" - chỉ hiển thị kết quả cấp tỉnh</p>
-                    <p>"<strong>Huyện Tuy Hòa</strong>" - chỉ hiển thị kết quả cấp huyện</p>
-                    <p>"<strong>Xã Hòa Bình</strong>" - chỉ hiển thị kết quả cấp xã</p>
+                <div className="max-w-md mx-auto text-sm text-gray-400">
+                    <p className="mb-2">💡 <strong>Mẹo tìm kiếm:</strong></p>
+                    <div className="text-left space-y-1">
+                        <p>"<strong>An Khánh</strong>" - tìm tất cả đơn vị có tên này</p>
+                        <p>"<strong>Tuy Hòa</strong>" - tìm tất cả đơn vị có tên này</p>
+                        <p>"<strong>Tỉnh Phú Yên</strong>" - chỉ tìm cấp tỉnh</p>
+                        <p>"<strong>Huyện Tuy Hòa</strong>" - chỉ tìm cấp huyện</p>
+                        <p>"<strong>Xã Hòa Bình</strong>" - chỉ tìm cấp xã</p>
+                    </div>
                 </div>
             </div>
         );
@@ -71,11 +71,20 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
             <div className="text-center py-16">
                 <FontAwesomeIcon icon={faSearch} className="text-gray-400 text-4xl mb-4" />
                 <h3 className="text-lg font-medium text-gray-700 mb-2">
-                    Không tìm thấy kết quả
+                    Không tìm thấy kết quả cho "{searchQuery}"
                 </h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 mb-4">
                     Thử với từ khóa khác hoặc kiểm tra lại chính tả
                 </p>
+                <div className="max-w-md mx-auto text-sm text-gray-400">
+                    <p className="mb-2">💡 <strong>Gợi ý:</strong></p>
+                    <div className="text-left space-y-1">
+                        <p>• Thử tìm kiếm với từ khóa ngắn hơn: "<strong>Tuy Hòa</strong>"</p>
+                        <p>• Không cần gõ dấu tiếng Việt: "<strong>tuy hoa</strong>"</p>
+                        <p>• Thử tìm kiếm tên cũ thay vì tên mới</p>
+                        <p>• Chỉ sử dụng prefix khi muốn lọc cấp: "<strong>Huyện Tuy Hòa</strong>"</p>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -88,21 +97,21 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
                     <FontAwesomeIcon icon={faInfoCircle} className="text-blue-600 mt-0.5" />
                     <div>
                         <div className="text-sm text-blue-800">
-                            <strong>Kết quả tìm kiếm:</strong> {filteredResults.length} kết quả
+                            <strong>Kết quả tìm kiếm cho:</strong> "<span className="font-mono">{searchQuery}</span>"
+                        </div>
+                        <div className="text-sm text-blue-700 mt-1">
+                            Tìm thấy {filteredResults.length} kết quả
                             {detectedLevel !== 'all' && (
                                 <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
-                                    {detectedLevel === 'province' && 'Chỉ hiển thị cấp tỉnh/thành phố'}
-                                    {detectedLevel === 'district' && 'Chỉ hiển thị cấp quận/huyện'}
-                                    {detectedLevel === 'commune' && 'Chỉ hiển thị cấp xã/phường'}
+                                    {detectedLevel === 'province' && 'Lọc theo cấp tỉnh/thành phố'}
+                                    {detectedLevel === 'district' && 'Lọc theo cấp quận/huyện'}
+                                    {detectedLevel === 'commune' && 'Lọc theo cấp xã/phường'}
                                 </span>
                             )}
                         </div>
                         {hasMoreResults && (
                             <div className="text-xs text-blue-600 mt-1">
-                                {detectedLevel === 'all' ?
-                                    `Có ${results.length - filteredResults.length} kết quả khác. Sử dụng từ khóa cụ thể hơn.` :
-                                    `Đã lọc ra ${results.length - filteredResults.length} kết quả không đúng cấp.`
-                                }
+                                Có {results.length - filteredResults.length} kết quả khác. Scroll xuống để xem thêm.
                             </div>
                         )}
                     </div>

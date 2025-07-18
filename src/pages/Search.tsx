@@ -1,6 +1,5 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useSearchData } from '../hooks/useSearchData';
-import { useDebounce } from '../hooks/useDebounce';
 import SearchHeader from '../components/SearchHeader';
 import SearchResults from '../components/SearchResults';
 import Header from '../components/Header';
@@ -8,13 +7,30 @@ import Header from '../components/Header';
 const Search: React.FC = () => {
     const { search, loading, error, totalItems } = useSearchData();
     const [searchQuery, setSearchQuery] = useState('');
+    const [results, setResults] = useState<any[]>([]);
+    const [isSearching, setIsSearching] = useState(false);
 
-    // Debounce search query để tránh search liên tục
-    const debouncedSearchQuery = useDebounce(searchQuery, 200);
+    const handleSearch = useCallback(async (query: string) => {
+        setIsSearching(true);
+        console.log('Starting search for:', query);
 
-    const filteredResults = useMemo(() => {
-        return search(debouncedSearchQuery);
-    }, [search, debouncedSearchQuery]);
+        try {
+            const startTime = performance.now();
+            const searchResults = search(query);
+            const endTime = performance.now();
+
+            console.log('Search completed in:', endTime - startTime, 'ms');
+            console.log('Results count:', searchResults.length);
+
+            setSearchQuery(query);
+            setResults(searchResults);
+        } catch (err) {
+            console.error('Search error:', err);
+            setResults([]);
+        } finally {
+            setIsSearching(false);
+        }
+    }, [search]);
 
     if (loading) {
         return (
@@ -47,14 +63,14 @@ const Search: React.FC = () => {
 
             <div className="container mx-auto px-4 py-6 max-w-4xl">
                 <SearchHeader
-                    searchQuery={searchQuery}
-                    onSearchChange={setSearchQuery}
+                    onSearch={handleSearch}
                     totalItems={totalItems}
+                    isSearching={isSearching}
                 />
 
                 <SearchResults
-                    results={filteredResults}
-                    searchQuery={debouncedSearchQuery}
+                    results={results}
+                    searchQuery={searchQuery}
                 />
             </div>
         </div>
