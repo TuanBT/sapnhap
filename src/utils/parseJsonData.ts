@@ -21,7 +21,6 @@ interface JsonData {
 }
 
 export function parseJsonData(jsonData: JsonData): SearchItem[] {
-    console.log(`Loading ${jsonData.metadata.totalChanges} changes from JSON`);
 
     const normalizeText = (text: string) => {
         if (!text) return '';
@@ -35,7 +34,7 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
     const districtChanges = new Map<string, { oldProvince: string; newProvince: string; oldDistrict: string; newDistrict: string }>();
 
     // First pass: Create commune items and collect unique province/district changes
-    jsonData.changes.forEach((change, index) => {
+    jsonData.changes.forEach((change) => {
         const newUnit: AdministrativeUnit = {
             province: normalizeText(change.newUnit.province),
             district: change.newUnit.district,
@@ -97,16 +96,6 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
 
         searchItems.push(communeItem);
 
-        // Debug: log mọi item có chứa "Tuy Hoà"
-        if (baseSearchText.includes('Tuy Hoà') || baseSearchText.includes('Tuy Hòa')) {
-            console.log(`Found Tuy Hoà item ${index}:`, {
-                id: change.id,
-                name: newUnit.ward,
-                searchText: baseSearchText,
-                newUnit,
-                oldUnits
-            });
-        }
     });
 
     // Second pass: Create unique province items
@@ -140,16 +129,7 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
         };
         searchItems.push(districtItem);
 
-        // Debug: log mọi district có chứa "Tuy Hoà"
-        if (districtItem.searchText.includes('Tuy Hoà') || districtItem.searchText.includes('Tuy Hòa')) {
-            console.log(`Found Tuy Hoà district:`, districtItem);
-        }
     });
-
-    console.log(`Generated ${searchItems.length} search items:`);
-    console.log(`- Provinces: ${provinceChanges.size}`);
-    console.log(`- Districts: ${districtChanges.size}`);
-    console.log(`- Communes: ${jsonData.changes.length}`);
 
     return searchItems;
 }

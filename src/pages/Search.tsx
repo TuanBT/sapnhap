@@ -11,15 +11,9 @@ const Search: React.FC = () => {
 
     const handleSearch = useCallback(async (query: string) => {
         setIsSearching(true);
-        console.log('Starting search for:', query);
 
         try {
-            const startTime = performance.now();
             const searchResults = search(query);
-            const endTime = performance.now();
-
-            console.log('Search completed in:', endTime - startTime, 'ms');
-            console.log('Results count:', searchResults.length);
 
             setSearchQuery(query);
             setResults(searchResults);

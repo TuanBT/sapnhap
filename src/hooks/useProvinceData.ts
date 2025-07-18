@@ -67,11 +67,6 @@ export function useProvinceData(): UseProvinceDataReturn {
                     });
                 });
 
-                console.log('Generated mapping:', generatedMapping);
-                console.log('Provinces:', provincesData);
-                console.log('Provinces merged:', provincesMergedData);
-                console.log('Merge info:', mergeInfoData);
-
                 setProvinces(provincesData);
                 setProvincesMerged(provincesMergedData);
                 setProvinceMapping(generatedMapping);

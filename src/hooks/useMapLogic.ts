@@ -91,7 +91,6 @@ export const useMapLogic = ({
             const mappedId = provinceMapping[provinceId];
             if (mappedId) {
                 targetIds = [mappedId];
-                console.log(`Mapping ${provinceId} (${provinces[provinceId]}) -> ${mappedId} (${provincesMerged[mappedId]})`);
             } else {
                 console.warn(`No mapping found for ${provinceId} (${provinces[provinceId]})`);
             }
@@ -103,7 +102,6 @@ export const useMapLogic = ({
                 targetIds = Object.keys(provinceMapping).filter(oldId =>
                     provinceMapping[oldId] === provinceId
                 );
-                console.log(`Reverse mapping ${provinceId} (${provincesMerged[provinceId]}) -> ${targetIds.map(id => `${id} (${provinces[id]})`).join(', ')}`);
             } else {
                 console.warn(`No merge info found for ${provinceId} (${provincesMerged[provinceId]})`);
             }
@@ -113,7 +111,6 @@ export const useMapLogic = ({
         targetIds.forEach(targetId => {
             const targetElement = findElementById(otherSvg, targetId);
             if (targetElement) {
-                console.log(`Highlighting ${targetId} in ${otherMapType} map`);
                 highlightElement(targetElement);
             } else {
                 console.warn(`Element with ID ${targetId} not found in ${otherMapType} map`);
@@ -129,10 +126,6 @@ export const useMapLogic = ({
             console.warn('No province ID found for element:', element);
             return;
         }
-
-        console.log(`=== HOVER EVENT ===`);
-        console.log(`Map type: ${mapType}`);
-        console.log(`Province ID: ${provinceId}`);
 
         // Highlight element hiện tại
         highlightElement(element);
@@ -151,14 +144,11 @@ export const useMapLogic = ({
             // Từ bản đồ hiện tại (63 tỉnh)
             const beforeProvinceName = provinces[provinceId] || provinceId;
             hoveredProvince = beforeProvinceName; // Tỉnh đang hover
-            console.log(`Before province name: ${beforeProvinceName}`);
 
             const mappedId = provinceMapping[provinceId];
-            console.log(`Mapped ID: ${mappedId}`);
 
             if (mappedId && provincesMerged[mappedId]) {
                 mergedName = provincesMerged[mappedId];
-                console.log(`Merged province name: ${mergedName}`);
 
                 const info = mergeInfo[mappedId];
                 if (info) {
@@ -184,7 +174,6 @@ export const useMapLogic = ({
             // Từ bản đồ sau sáp nhập (34 tỉnh)
             mergedName = provincesMerged[provinceId] || provinceId;
             hoveredProvince = mergedName; // Tỉnh đang hover
-            console.log(`Merged province name: ${mergedName}`);
 
             const info = mergeInfo[provinceId];
             if (info && info.originalProvinces) {
@@ -199,15 +188,6 @@ export const useMapLogic = ({
                 desc = `${mergedName} không có thông tin sáp nhập`;
             }
         }
-
-        console.log('Final result:', {
-            beforeName,
-            mergedName,
-            hoveredProvince,
-            allRelated,
-            related,
-            desc
-        });
 
         // Cập nhật state
         setBeforeProvinceName(beforeName);

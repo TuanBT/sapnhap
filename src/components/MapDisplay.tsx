@@ -101,11 +101,9 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
 
         // Add event listeners
         const elements = svg.querySelectorAll('path, g[id*="VN-"]');
-        console.log(`Setting up ${mapType} map - found ${elements.length} elements`);
 
         elements.forEach((element, index) => {
             if (index < 3) {
-                console.log(`${mapType} element ${index}: ${element.id}`);
             }
 
             element.addEventListener('mouseenter', () => {

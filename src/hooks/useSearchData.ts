@@ -40,16 +40,6 @@ export function useSearchData() {
             });
 
             setData(flatItems);
-            console.log('Loaded data:', flatItems.length, 'items');
-
-            // Debug: Tìm các item có chứa "quan 3"
-            const quan3Items = flatItems.filter(item =>
-                item.normalizedSearchText.includes('quan 3')
-            );
-            console.log('Items containing "quan 3":', quan3Items.length);
-            if (quan3Items.length > 0) {
-                console.log('Sample quan 3 items:', quan3Items.slice(0, 3));
-            }
         } catch (err) {
             console.error('Error loading data:', err);
             setError(err instanceof Error ? err.message : 'Unknown error');
@@ -98,7 +88,6 @@ export function useSearchData() {
         }
 
         const { level: targetLevel, cleanQuery } = detectAdministrativeLevel(query);
-        console.log('Searching for:', cleanQuery, 'target level:', targetLevel);
 
         // Giảm minimum length xuống 1 để cho phép tìm "3", "1", "2" etc.
         if (cleanQuery.length < 1) {
@@ -143,8 +132,6 @@ export function useSearchData() {
                 results.push({ item, score });
             }
         }
-
-        console.log('Total results:', results.length);
 
         // Sort by score và prioritize theo level
         const sortedResults = results.sort((a, b) => {

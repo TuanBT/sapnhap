@@ -87,7 +87,6 @@ export class SVGMerger {
             if (elements.length === 1) {
                 // Chỉ có 1 element, chỉ cần đổi ID
                 primaryElement.id = group.newId;
-                console.log(`✅ Renamed single element: ${group.oldIds[0]} → ${group.newId}`);
             } else {
                 // Có nhiều elements, cần merge
                 const otherElements = elements.slice(1);
@@ -106,8 +105,6 @@ export class SVGMerger {
                         el.parentNode.removeChild(el);
                     }
                 });
-
-                console.log(`✅ Merged ${elements.length} elements into: ${group.newId}`);
             }
         });
 
