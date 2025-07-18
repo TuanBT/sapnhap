@@ -155,6 +155,7 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = memo(({ item, sear
                 {showDetails && (
                     <div className="mt-6 pt-4 border-t border-gray-200">
                         <div className="space-y-6">
+                            {/* Tất cả đơn vị cũ */}
                             <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500" />
@@ -186,31 +187,7 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = memo(({ item, sear
                                 </div>
                             </div>
 
-                            <div>
-                                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-green-500" />
-                                    Đơn vị sau sắp xếp:
-                                </h4>
-                                <div className="bg-green-50 rounded p-4 border border-green-200">
-                                    <div className="text-lg font-bold text-green-800">
-                                        🏛️ {highlightText(item.newUnit.province, searchQuery)}
-                                    </div>
-                                    <div className="text-sm text-green-600 mt-1 italic">
-                                        📍 (trực thuộc tỉnh/thành phố)
-                                    </div>
-                                    <div className="text-sm text-green-700 mt-1">
-                                        🏠 {highlightText(item.newUnit.ward, searchQuery)}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="bg-blue-50 rounded p-3 border border-blue-200">
-                                <div className="text-xs text-blue-800">
-                                    <strong>Ghi chú:</strong> Sau sắp xếp, đơn vị mới trực thuộc tỉnh/thành phố,
-                                    không còn cấp quận/huyện trung gian.
-                                </div>
-                            </div>
-
+                            {/* Văn bản pháp lý */}
                             {item.document && (
                                 <div>
                                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
