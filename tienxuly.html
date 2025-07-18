@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Xử lý format đơn giản</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+        textarea { width: 100%; height: 200px; font-family: monospace; }
+        button { padding: 8px 12px; margin: 5px; }
+        .example { background: #f0f0f0; padding: 10px; margin: 10px 0; border-radius: 5px; }
+    </style>
+</head>
+<body>
+<h2>Xử lý format đơn giản</h2>
+
+<div class="example">
+    <strong>Input format:</strong><br>
+    <code>STT. đơn vị cũ 1, đơn vị cũ 2, ... -> đơn vị mới</code>
+</div>
+
+<div>
+    <label>Nhập dữ liệu (mỗi dòng theo format trên):</label><br>
+    <textarea id="input" placeholder="15. xã Phú Thành, xã Lục Sĩ Thành -> xã Lục Sĩ Thành"></textarea>
+</div>
+
+<div>
+    <button onclick="process()">Xử lý</button>
+    <button onclick="copy()">Sao chép</button>
+    <button onclick="clear()">Xóa</button>
+</div>
+
+<div>
+    <label>Kết quả Excel format:</label><br>
+    <textarea id="output" readonly></textarea>
+</div>
+
+<script>
+    function process() {
+        const input = document.getElementById('input').value.trim();
+        const lines = input.split('\n').filter(line => line.trim());
+
+        let result = 'STT\tTỉnh/TP mới\tPhường/Xã cũ\tPhường/Xã mới\tLoại sắp xếp\tVăn bản gốc\n';
+        let stt = 1;
+
+        lines.forEach(line => {
+            const match = line.match(/^(\d+)\.\s*(.+?)\s*->\s*(.+)$/);
+            if (match) {
+                const [, originalSTT, oldUnits, newUnit] = match;
+                const oldList = oldUnits.split(',').map(s => s.trim());
+
+                // Xác định loại sắp xếp
+                let arrangeType = 'Sắp xếp toàn bộ';
+                if (oldList.length === 1 && oldList[0] === newUnit.trim()) {
+                    arrangeType = 'Không sắp xếp';
+                }
+
+                // Tạo dòng cho mỗi đơn vị cũ
+                oldList.forEach(oldUnit => {
+                    result += `${stt}\t[TỈnh]\t${oldUnit}\t${newUnit.trim()}\t${arrangeType}\t${line}\n`;
+                    stt++;
+                });
+            }
+        });
+
+        document.getElementById('output').value = result;
+    }
+
+    function copy() {
+        const output = document.getElementById('output');
+        if (!output.value.trim()) {
+            alert('Chưa có dữ liệu!');
+            return;
+        }
+
+        navigator.clipboard.writeText(output.value).then(() => {
+            alert('Đã sao chép!');
+        }).catch(() => {
+            output.select();
+            document.execCommand('copy');
+            alert('Đã sao chép!');
+        });
+    }
+
+    function clear() {
+        document.getElementById('input').value = '';
+        document.getElementById('output').value = '';
+    }
+</script>
+</body>
+</html>

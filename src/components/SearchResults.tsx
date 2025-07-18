@@ -1,7 +1,6 @@
-
-import React, { useState } from 'react';
+import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faChartBar, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import type { FlatItem } from '../hooks/useSearchData';
 import SimpleSearchResult from './SimpleSearchResult';
 
@@ -11,130 +10,47 @@ interface SearchResultsProps {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const itemsPerPage = 10;
-
-    const totalPages = Math.ceil(results.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentResults = results.slice(startIndex, endIndex);
+    if (!searchQuery.trim()) {
+        return (
+            <div className="text-center py-16">
+                <FontAwesomeIcon icon={faSearch} className="text-gray-400 text-4xl mb-4" />
+                <h3 className="text-lg font-medium text-gray-700 mb-2">
+                    Nhập từ khóa để tìm kiếm
+                </h3>
+                <p className="text-gray-500">
+                    Tìm kiếm theo tên phường/xã cũ hoặc mới
+                </p>
+            </div>
+        );
+    }
 
     if (results.length === 0) {
         return (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-                <FontAwesomeIcon icon={faSearch} className="text-gray-300 text-6xl mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">
+            <div className="text-center py-16">
+                <FontAwesomeIcon icon={faSearch} className="text-gray-400 text-4xl mb-4" />
+                <h3 className="text-lg font-medium text-gray-700 mb-2">
                     Không tìm thấy kết quả
                 </h3>
-                <p className="text-gray-600">
-                    {searchQuery
-                        ? `Thử tìm kiếm với từ khóa khác thay vì "${searchQuery}"`
-                        : 'Nhập tên tỉnh, huyện, xã để tìm kiếm thông tin sáp nhập'
-                    }
+                <p className="text-gray-500">
+                    Thử với từ khóa khác hoặc kiểm tra lại chính tả
                 </p>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            {/* Results header */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div className="flex items-center space-x-2">
-                            <FontAwesomeIcon icon={faChartBar} className="text-blue-500" />
-                            <span className="text-blue-500 font-semibold">Kết quả:</span>
-                            <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm font-medium">
-                                {results.length} đơn vị
-                            </span>
-                        </div>
-                        {searchQuery && (
-                            <div className="text-sm text-gray-500">
-                                Tìm kiếm: "<span className="font-medium">{searchQuery}</span>"
-                            </div>
-                        )}
-                    </div>
-
-                    {totalPages > 1 && (
-                        <div className="text-sm text-gray-500">
-                            Trang {currentPage} / {totalPages}
-                        </div>
-                    )}
-                </div>
+        <div className="space-y-4">
+            <div className="text-sm text-gray-600 mb-4">
+                Tìm thấy <span className="font-medium text-blue-600">{results.length}</span> kết quả
             </div>
 
-            {/* Results list */}
-            <div className="space-y-4">
-                {currentResults.map((item, index) => (
-                    <SimpleSearchResult
-                        key={`${item.fullPath}-${index}`}
-                        item={item}
-                        searchQuery={searchQuery}
-                    />
-                ))}
-            </div>
-
-            {/* Pagination */}
-            {totalPages > 1 && (
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-                    <div className="flex items-center justify-between">
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                            disabled={currentPage === 1}
-                            className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <FontAwesomeIcon icon={faChevronLeft} />
-                            <span>Trang trước</span>
-                        </button>
-
-                        <div className="flex items-center space-x-2">
-                            {/* Page numbers */}
-                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                                const pageNum = i + 1;
-                                return (
-                                    <button
-                                        key={pageNum}
-                                        onClick={() => setCurrentPage(pageNum)}
-                                        className={`px-3 py-1 text-sm font-medium rounded-md ${
-                                            currentPage === pageNum
-                                                ? 'bg-blue-500 text-white'
-                                                : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                    >
-                                        {pageNum}
-                                    </button>
-                                );
-                            })}
-
-                            {totalPages > 5 && (
-                                <>
-                                    <span className="text-gray-400">...</span>
-                                    <button
-                                        onClick={() => setCurrentPage(totalPages)}
-                                        className={`px-3 py-1 text-sm font-medium rounded-md ${
-                                            currentPage === totalPages
-                                                ? 'bg-blue-500 text-white'
-                                                : 'text-gray-700 hover:bg-gray-100'
-                                        }`}
-                                    >
-                                        {totalPages}
-                                    </button>
-                                </>
-                            )}
-                        </div>
-
-                        <button
-                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                            disabled={currentPage === totalPages}
-                            className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 border border-gray-300 rounded-md hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            <span>Trang sau</span>
-                            <FontAwesomeIcon icon={faChevronRight} />
-                        </button>
-                    </div>
-                </div>
-            )}
+            {results.map((item) => (
+                <SimpleSearchResult
+                    key={item.id}
+                    item={item}
+                    searchQuery={searchQuery}
+                />
+            ))}
         </div>
     );
 };

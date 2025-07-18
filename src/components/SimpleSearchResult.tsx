@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBuilding, faCity, faHome, faMapMarkerAlt, faListUl, faCheckCircle, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import type { FlatItem } from '../hooks/useSearchData';
+import { faHome, faArrowRight, faEye, faEyeSlash, faFileText, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
+import type { FlatItem, AdministrativeUnit } from '../hooks/useSearchData';
 
 interface SimpleSearchResultProps {
     item: FlatItem;
@@ -9,7 +9,7 @@ interface SimpleSearchResultProps {
 }
 
 const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQuery }) => {
-    const [showAllOldNames, setShowAllOldNames] = useState(false);
+    const [showDetails, setShowDetails] = useState(false);
 
     const highlightText = (text: string, query: string) => {
         if (!query.trim()) return text;
@@ -28,131 +28,179 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
         );
     };
 
-    const getTypeInfo = (type: string) => {
-        switch (type) {
-            case 'province':
-                return {
-                    icon: faCity,
-                    label: 'Tỉnh/TP',
-                    color: 'bg-blue-50 text-blue-700 border-blue-200',
-                    cardColor: 'border-blue-200 bg-blue-50/30',
-                    indent: 'ml-0'
-                };
-            case 'district':
-                return {
-                    icon: faBuilding,
-                    label: 'Huyện/Quận',
-                    color: 'bg-green-50 text-green-700 border-green-200',
-                    cardColor: 'border-green-200 bg-green-50/30',
-                    indent: 'ml-4'
-                };
-            case 'commune':
-                return {
-                    icon: faHome,
-                    label: 'Xã/Phường',
-                    color: 'bg-purple-50 text-purple-700 border-purple-200',
-                    cardColor: 'border-purple-200 bg-purple-50/30',
-                    indent: 'ml-8'
-                };
-            default:
-                return {
-                    icon: faMapMarkerAlt,
-                    label: 'Khác',
-                    color: 'bg-gray-50 text-gray-700 border-gray-200',
-                    cardColor: 'border-gray-200 bg-gray-50/30',
-                    indent: 'ml-0'
-                };
-        }
-    };
+    const renderAdministrativeUnit = (unit: AdministrativeUnit, isOld: boolean, index?: number) => {
+        const bgColor = isOld ? 'bg-red-50' : 'bg-green-50';
+        const textColor = isOld ? 'text-red-700' : 'text-green-700';
 
-    const typeInfo = getTypeInfo(item.type);
-    const displayOldNames = showAllOldNames ? item.oldNames : item.oldNames.slice(0, 3);
-    const hasMoreOldNames = item.oldNames.length > 3;
-
-    return (
-        <div className={`bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow ${typeInfo.cardColor} ${typeInfo.indent}`}>
-            {/* Header */}
-            <div className="p-4 border-b border-gray-100">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <FontAwesomeIcon icon={typeInfo.icon} className="text-lg text-gray-600" />
-                        <div>
-                            <h3 className="font-semibold text-gray-900 text-lg">
-                                {highlightText(item.name, searchQuery)}
-                            </h3>
-                            <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full border ${typeInfo.color}`}>
-                                {item.fullPath}
-                            </span>
+        return (
+            <div key={index} className={`${bgColor} rounded-lg p-3 border ${isOld ? 'border-red-200' : 'border-green-200'}`}>
+                <div className="space-y-1">
+                    <div className={`font-medium ${textColor}`}>
+                        {highlightText(unit.ward, searchQuery)}
+                    </div>
+                    <div className="text-xs space-y-0.5">
+                        <div className={`${textColor} opacity-75`}>
+                            📍 {highlightText(unit.district, searchQuery)}
+                        </div>
+                        <div className={`${textColor} opacity-60`}>
+                            🏛️ {highlightText(unit.province, searchQuery)}
                         </div>
                     </div>
                 </div>
             </div>
+        );
+    };
 
-            {/* Main content: Before → After */}
+    const getRelevantOldUnits = (oldUnits: AdministrativeUnit[], query: string) => {
+        if (!query.trim()) return oldUnits.slice(0, 3);
+
+        const lowerQuery = query.toLowerCase();
+        const relevantUnits = oldUnits.filter(unit =>
+            unit.ward.toLowerCase().includes(lowerQuery) ||
+            unit.district.toLowerCase().includes(lowerQuery) ||
+            unit.province.toLowerCase().includes(lowerQuery)
+        );
+
+        if (relevantUnits.length > 0) {
+            return relevantUnits.slice(0, 3);
+        }
+
+        return oldUnits.slice(0, 3);
+    };
+
+    const relevantOldUnits = getRelevantOldUnits(item.oldUnits, searchQuery);
+    const hasMoreUnits = item.oldUnits.length > 3;
+
+    return (
+        <div className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow border-purple-200">
             <div className="p-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* LEFT: Trước sáp nhập (CŨ) */}
-                    <div className="space-y-2">
-                        <div className="flex items-center space-x-2 mb-3">
-                            <FontAwesomeIcon icon={faListUl} className="text-red-500" />
-                            <span className="text-red-500 font-semibold">TRƯỚC SÁP NHẬP</span>
-                            <span className="text-xs bg-red-100 text-red-700 px-2 py-1 rounded-full">
-                                {item.oldNames.length} đơn vị
-                            </span>
+                {/* Header */}
+                <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                        <FontAwesomeIcon icon={faHome} className="text-purple-600" />
+                        <span className="text-sm font-medium text-purple-600">
+                            Sắp xếp hành chính
+                        </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <span className="text-xs text-gray-500">
+                            {item.oldUnits.length} → 1
+                        </span>
+                        <button
+                            onClick={() => setShowDetails(!showDetails)}
+                            className="flex items-center space-x-1 text-xs text-blue-600 hover:text-blue-800"
+                        >
+                            <FontAwesomeIcon icon={showDetails ? faEyeSlash : faEye} />
+                            <span>{showDetails ? 'Ẩn' : 'Chi tiết'}</span>
+                        </button>
+                    </div>
+                </div>
+
+                {/* Main comparison */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
+                    {/* TRƯỚC */}
+                    <div className="space-y-3">
+                        <div className="text-center">
+                            <div className="text-xs font-medium text-red-600 mb-2">
+                                TRƯỚC SÁP XẾP
+                            </div>
+                            <div className="h-px bg-red-200"></div>
                         </div>
-
                         <div className="space-y-2">
-                            {displayOldNames.map((oldName, index) => (
-                                <div key={index} className="flex items-center space-x-2 p-2 bg-red-50 rounded-md border border-red-100">
-                                    <span className="text-red-400 text-xs">•</span>
-                                    <span className="text-sm text-red-700">
-                                        {highlightText(oldName, searchQuery)}
-                                    </span>
+                            {relevantOldUnits.map((unit, index) => renderAdministrativeUnit(unit, true, index))}
+                            {hasMoreUnits && (
+                                <div className="text-xs text-red-500 text-center py-2">
+                                    +{item.oldUnits.length - 3} đơn vị khác
                                 </div>
-                            ))}
-
-                            {hasMoreOldNames && (
-                                <button
-                                    onClick={() => setShowAllOldNames(!showAllOldNames)}
-                                    className="flex items-center space-x-1 text-xs text-red-600 hover:text-red-800 font-medium"
-                                >
-                                    <FontAwesomeIcon icon={showAllOldNames ? faChevronUp : faChevronDown} />
-                                    <span>
-                                        {showAllOldNames
-                                            ? 'Thu gọn'
-                                            : `+ ${item.oldNames.length - 3} đơn vị khác`
-                                        }
-                                    </span>
-                                </button>
                             )}
                         </div>
                     </div>
 
-                    {/* RIGHT: Sau sáp nhập (MỚI) */}
-                    <div className="space-y-2">
-                        <div className="flex items-center space-x-2 mb-3">
-                            <FontAwesomeIcon icon={faCheckCircle} className="text-green-500" />
-                            <span className="text-green-500 font-semibold">SAU SÁP NHẬP</span>
-                            <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                1 đơn vị
-                            </span>
-                        </div>
+                    {/* Arrow */}
+                    <div className="flex justify-center items-center">
+                        <FontAwesomeIcon
+                            icon={faArrowRight}
+                            className="text-gray-400 text-xl"
+                        />
+                    </div>
 
-                        <div className="p-4 bg-green-50 rounded-md border border-green-100">
-                            <div className="flex items-center space-x-2">
-                                <FontAwesomeIcon icon={faCheckCircle} className="text-green-400" />
-                                <div>
-                                    <div className="font-semibold text-green-800 text-lg">
-                                        {highlightText(item.name, searchQuery)}
-                                    </div>
-                                    <div className="text-xs text-green-600 mt-1">
-                                        {item.fullPath}
-                                    </div>
-                                </div>
+                    {/* SAU */}
+                    <div className="space-y-3">
+                        <div className="text-center">
+                            <div className="text-xs font-medium text-green-600 mb-2">
+                                SAU SÁP XẾP
                             </div>
+                            <div className="h-px bg-green-200"></div>
+                        </div>
+                        <div>
+                            {renderAdministrativeUnit(item.newUnit, false)}
                         </div>
                     </div>
                 </div>
+
+                {/* Expandable Details */}
+                {showDetails && (
+                    <div className="mt-6 pt-4 border-t border-gray-200">
+                        <div className="space-y-6">
+                            {/* Tất cả đơn vị cũ */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500" />
+                                    Tất cả đơn vị trước sắp xếp ({item.oldUnits.length}):
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {item.oldUnits.map((unit, index) => (
+                                        <div key={index} className="bg-gray-50 rounded p-3 border">
+                                            <div className="text-sm font-medium text-gray-800">
+                                                {highlightText(unit.ward, searchQuery)}
+                                            </div>
+                                            <div className="text-xs text-gray-600 mt-1">
+                                                📍 {highlightText(unit.district, searchQuery)}
+                                            </div>
+                                            <div className="text-xs text-gray-500">
+                                                🏛️ {highlightText(unit.province, searchQuery)}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Đơn vị mới chi tiết */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                    <FontAwesomeIcon icon={faMapMarkerAlt} className="text-green-500" />
+                                    Đơn vị sau sắp xếp:
+                                </h4>
+                                <div className="bg-green-50 rounded p-4 border border-green-200">
+                                    <div className="text-lg font-medium text-green-800">
+                                        {highlightText(item.newUnit.ward, searchQuery)}
+                                    </div>
+                                    <div className="text-sm text-green-700 mt-1">
+                                        📍 {highlightText(item.newUnit.district, searchQuery)}
+                                    </div>
+                                    <div className="text-sm text-green-600">
+                                        🏛️ {highlightText(item.newUnit.province, searchQuery)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Văn bản pháp lý */}
+                            {item.document && (
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                        <FontAwesomeIcon icon={faFileText} className="text-blue-500" />
+                                        Văn bản sắp xếp:
+                                    </h4>
+                                    <div className="bg-blue-50 rounded p-3 border border-blue-200">
+                                        <div className="text-sm text-blue-800">
+                                            {item.document}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

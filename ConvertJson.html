@@ -2,120 +2,58 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <title>📋 Chuyển Excel → JSON gộp xã (loại bỏ cấp huyện)</title>
+  <title>Thêm prefix xã/phường</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; max-width: 900px; margin: auto; }
-    textarea { width: 100%; height: 200px; font-family: monospace; }
-    pre { background: #f0f0f0; padding: 10px; overflow-x: auto; white-space: pre-wrap; }
-    button { padding: 10px 15px; margin-top: 10px; }
+    body { font-family: sans-serif; padding: 20px; }
+    textarea { width: 100%; height: 200px; margin-top: 10px; }
+    pre { background: #f8f8f8; padding: 10px; white-space: pre-wrap; }
   </style>
 </head>
 <body>
-<h2>📋 Chuyển Excel → JSON gộp xã (không còn cấp huyện)</h2>
+<h2>Tool thêm prefix (xã, phường, thị trấn)</h2>
+<p>Nhập nội dung từng dòng theo mẫu:</p>
+<pre>
+xã A, xã B, C, D -> xã X
+phường M, N, phường O -> phường Y
+  </pre>
 
-<p>1. Copy dữ liệu từ Excel (gồm 5 cột: STT, Tỉnh mới, Gộp từ tỉnh cũ, Phường/Xã mới, Gộp từ các xã cũ)</p>
-<p>2. Dán vào ô bên dưới:</p>
+<textarea id="input" placeholder="Dán danh sách tại đây..."></textarea>
+<button onclick="process()">Xử lý</button>
 
-<textarea id="excelInput" placeholder="Dán dữ liệu Excel ở đây..."></textarea>
-<br>
-<button onclick="convertToJson()">🔁 Chuyển thành JSON</button>
-<button onclick="downloadJson()">⬇️ Tải file JSON</button>
-
-<h3>📤 Kết quả JSON:</h3>
-<textarea id="jsonOutput" readonly placeholder="JSON sẽ hiển thị tại đây..."></textarea>
+<h3>Kết quả:</h3>
+<textarea id="output"></textarea>
 
 <script>
-  let finalJson = {};
+  function processLine(line) {
+    if (!line.includes("->")) return line;
 
-  // Danh sách các thành phố trực thuộc trung ương
-  const centralCities = new Set([
-    'Cần Thơ',
-    'Đà Nẵng',
-    'Hà Nội',
-    'Hải Phòng',
-    'Hồ Chí Minh',
-    'Huế'
-  ]);
+    const [left, right] = line.split("->").map(s => s.trim());
 
-  function getProvincePrefix(provinceName) {
-    return centralCities.has(provinceName) ? 'Thành phố ' : 'Tỉnh ';
-  }
+    const items = left.split(",").map(item => item.trim());
 
-  function formatProvinceName(name, isOldName = false) {
-    // Nếu tên đã có prefix, giữ nguyên
-    if (name.startsWith('Tỉnh ') || name.startsWith('Thành phố ')) {
-      return name;
-    }
+    const knownPrefixes = ["xã", "phường", "thị trấn"];
+    let currentPrefix = null;
 
-    // Nếu không có prefix, thêm prefix phù hợp
-    const prefix = getProvincePrefix(name);
-    return prefix + name;
-  }
-
-  function convertToJson() {
-    const text = document.getElementById("excelInput").value.trim();
-    const rows = text.split("\n").map(r => r.split("\t"));
-    const data = rows.slice(1); // Bỏ dòng tiêu đề
-
-    const provincesDict = {};
-    const provinceSet = new Set();
-    let totalCommunes = 0;
-
-    data.forEach((row, i) => {
-      if (row.length < 5) return;
-
-      const province = row[1]?.trim();
-      const oldProvinces = row[2]?.split(",").map(p => p.trim()).filter(Boolean);
-      const communeName = row[3]?.trim();
-      const oldCommunes = row[4]?.split(",").map(x => x.trim()).filter(Boolean);
-
-      if (!province || !communeName || !oldCommunes || oldCommunes.length === 0) return;
-
-      if (!provincesDict[province]) {
-        provincesDict[province] = {
-          name: formatProvinceName(province),
-          oldNames: [...new Set(oldProvinces)].map(name => formatProvinceName(name, true)),
-          type: "province",
-          communes: []
-        };
+    const processedItems = items.map(item => {
+      const foundPrefix = knownPrefixes.find(p => item.startsWith(p));
+      if (foundPrefix) {
+        currentPrefix = foundPrefix;
+        return item;
+      } else if (currentPrefix) {
+        return currentPrefix + " " + item;
+      } else {
+        return item; // không rõ prefix, giữ nguyên
       }
-
-      provincesDict[province].communes.push({
-        name: communeName,
-        oldNames: oldCommunes,
-        type: "commune"
-      });
-
-      provinceSet.add(province);
-      totalCommunes += 1;
     });
 
-    const json = {
-      metadata: {
-        version: "1.0",
-        lastUpdated: new Date().toISOString().split("T")[0],
-        totalProvinces: provinceSet.size,
-        totalCommunes: totalCommunes
-      },
-      provinces: Object.values(provincesDict)
-    };
-
-    finalJson = json;
-    document.getElementById("jsonOutput").value = JSON.stringify(json, null, 2);
+    return processedItems.join(", ") + " -> " + right;
   }
 
-  function downloadJson() {
-    if (!finalJson || Object.keys(finalJson).length === 0) {
-      alert("Chưa có dữ liệu JSON để tải.");
-      return;
-    }
-    const blob = new Blob([JSON.stringify(finalJson, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "xa_gop_sau_sap_nhap.json";
-    link.click();
-    URL.revokeObjectURL(url);
+  function process() {
+    const input = document.getElementById("input").value;
+    const lines = input.split("\n").map(line => line.trim());
+    const output = lines.map(processLine).join("\n");
+    document.getElementById("output").textContent = output;
   }
 </script>
 </body>

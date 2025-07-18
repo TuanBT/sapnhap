@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Chuẩn hóa văn bản từng dòng</title>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    textarea { width: 100%; height: 200px; margin-bottom: 10px; }
+    .result { white-space: pre-wrap; background: #f4f4f4; padding: 10px; border: 1px solid #ccc; }
+    button { padding: 5px 10px; }
+  </style>
+</head>
+<body>
+<h2>Chuẩn hóa văn bản từng dòng</h2>
+
+<label for="input">Dán văn bản vào đây:</label>
+<textarea id="input" placeholder="Dán nhiều dòng vào đây..."></textarea>
+<button onclick="normalizeText()">Chuẩn hóa</button>
+
+<h3>Kết quả chuẩn hóa:</h3>
+<textarea class="result" id="output"></textarea>
+
+<script>
+  function normalizeLine(line) {
+    return line
+            .normalize("NFC")              // chuẩn unicode
+            .replace(/\s+/g, " ")         // xoá khoảng trắng thừa
+            .replace(/\s([.,!?:;])/g, "$1") // xoá khoảng trắng trước dấu câu
+            .trim();                      // xoá khoảng trắng đầu/cuối
+  }
+
+  function normalizeText() {
+    const input = document.getElementById("input").value;
+    const lines = input.split("\n");
+    const normalized = lines.map(normalizeLine).join("\n");
+    document.getElementById("output").textContent = normalized;
+  }
+</script>
+</body>
+</html>

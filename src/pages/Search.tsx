@@ -3,17 +3,14 @@ import { useSearchData } from '../hooks/useSearchData';
 import SearchHeader from '../components/SearchHeader';
 import SearchResults from '../components/SearchResults';
 import Header from '../components/Header';
-import type { SearchFilter } from '../types/search';
 
 const Search: React.FC = () => {
-    const {search, loading, error } = useSearchData();
+    const { search, loading, error, totalItems } = useSearchData();
     const [searchQuery, setSearchQuery] = useState('');
-    const [searchFilter, setSearchFilter] = useState<SearchFilter>('all');
 
     const filteredResults = useMemo(() => {
-        const type = searchFilter === 'all' ? undefined : searchFilter;
-        return search(searchQuery, type);
-    }, [search, searchQuery, searchFilter]);
+        return search(searchQuery);
+    }, [search, searchQuery]);
 
     if (loading) {
         return (
@@ -32,6 +29,9 @@ const Search: React.FC = () => {
                 <div className="text-center">
                     <div className="text-red-500 text-4xl mb-4">⚠️</div>
                     <p className="text-red-600">Lỗi: {error}</p>
+                    <p className="text-sm text-gray-500 mt-2">
+                        Vui lòng đảm bảo file thongtinhanhchinh.txt có trong thư mục public
+                    </p>
                 </div>
             </div>
         );
@@ -44,9 +44,8 @@ const Search: React.FC = () => {
             <div className="container mx-auto px-4 py-6 max-w-4xl">
                 <SearchHeader
                     searchQuery={searchQuery}
-                    searchFilter={searchFilter}
                     onSearchChange={setSearchQuery}
-                    onFilterChange={setSearchFilter}
+                    totalItems={totalItems}
                 />
 
                 <SearchResults

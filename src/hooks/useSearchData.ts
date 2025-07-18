@@ -1,190 +1,227 @@
+import { useState, useEffect, useCallback } from 'react';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+export interface AdministrativeUnit {
+    province: string;
+    district: string;
+    ward: string;
+}
 
-// Base interface for all items
-export interface BaseItem {
+export interface FlatItem {
+    id: string;
     name: string;
-    oldNames: string[];
-    type: 'province' | 'district' | 'commune';
-}
-
-// Nested data structure interfaces
-export interface Commune extends BaseItem {
     type: 'commune';
-}
 
-export interface District extends BaseItem {
-    type: 'district';
-    communes: Commune[];
-}
+    // Thông tin mới (sau sắp xếp)
+    newUnit: AdministrativeUnit;
 
-export interface Province extends BaseItem {
-    type: 'province';
-    districts?: District[];
-    communes?: Commune[]; // Direct communes (no districts)
-}
+    // Thông tin cũ (trước sắp xếp)
+    oldUnits: AdministrativeUnit[];
 
-export interface NestedData {
-    metadata: {
-        version: string;
-        lastUpdated: string;
-        totalProvinces: number;
-        totalCommunes: number;
-    };
-    provinces: Province[];
-}
-
-// Flat data structure for search
-export interface FlatItem extends BaseItem {
-    parentProvince: string;
-    parentDistrict?: string;
-    mergeRatio: number;
+    // Metadata
+    document: string;
     fullPath: string;
+    searchText: string; // Để tìm kiếm
 }
 
-export interface SearchData {
-    provinces: FlatItem[];
-    districts: FlatItem[];
-    communes: FlatItem[];
-    allItems: FlatItem[];
+interface RawDataItem {
+    newProvince: string;
+    newWard: string;
+    oldProvince: string;
+    oldDistrict: string;
+    oldWard: string;
+    document: string;
 }
 
-interface UseSearchDataReturn {
-    nestedData: NestedData | null;
-    searchData: SearchData;
-    search: (query: string, type?: string) => FlatItem[];
-    loading: boolean;
-    error: string | null;
-}
-
-// Function to flatten nested data
-const flattenData = (nestedData: NestedData): FlatItem[] => {
-    const flatItems: FlatItem[] = [];
-
-    nestedData.provinces.forEach(province => {
-        // Add province
-        flatItems.push({
-            name: province.name,
-            oldNames: province.oldNames,
-            type: 'province',
-            parentProvince: province.name,
-            mergeRatio: province.oldNames.length,
-            fullPath: province.name
-        });
-
-        // Handle districts (if they exist)
-        if (province.districts) {
-            province.districts.forEach(district => {
-                // Add district
-                flatItems.push({
-                    name: district.name,
-                    oldNames: district.oldNames,
-                    type: 'district',
-                    parentProvince: province.name,
-                    mergeRatio: district.oldNames.length,
-                    fullPath: `${province.name} > ${district.name}`
-                });
-
-                // Add communes under district
-                district.communes.forEach(commune => {
-                    flatItems.push({
-                        name: commune.name,
-                        oldNames: commune.oldNames,
-                        type: 'commune',
-                        parentProvince: province.name,
-                        parentDistrict: district.name,
-                        mergeRatio: commune.oldNames.length,
-                        fullPath: `${province.name} > ${district.name} > ${commune.name}`
-                    });
-                });
-            });
-        }
-
-        // Handle direct communes (no districts)
-        if (province.communes) {
-            province.communes.forEach(commune => {
-                flatItems.push({
-                    name: commune.name,
-                    oldNames: commune.oldNames,
-                    type: 'commune',
-                    parentProvince: province.name,
-                    mergeRatio: commune.oldNames.length,
-                    fullPath: `${province.name} > ${commune.name}`
-                });
-            });
-        }
-    });
-
-    return flatItems;
-};
-
-export const useSearchData = (): UseSearchDataReturn => {
-    const [nestedData, setNestedData] = useState<NestedData | null>(null);
+export function useSearchData() {
+    const [data, setData] = useState<FlatItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Load nested data
-    useEffect(() => {
-        const loadData = async () => {
-            try {
-                const response = await fetch('/data.json');
-                if (!response.ok) throw new Error('Failed to load data.json');
-                const data = await response.json();
-                setNestedData(data);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'Failed to load data');
-            } finally {
-                setLoading(false);
-            }
-        };
+    const loadData = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
 
-        loadData();
+            const response = await fetch('/thongtinhanhchinh.txt');
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const textContent = await response.text();
+            const parsedData = parseAdminData(textContent);
+            setData(parsedData);
+        } catch (err) {
+            console.error('Error loading data:', err);
+            setError(err instanceof Error ? err.message : 'Unknown error');
+        } finally {
+            setLoading(false);
+        }
     }, []);
 
-    // Flatten data for search
-    const flatData = useMemo(() => {
-        if (!nestedData) return [];
-        return flattenData(nestedData);
-    }, [nestedData]);
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
-    // Create search data structure
-    const searchData = useMemo(() => {
-        const provinces = flatData.filter(item => item.type === 'province');
-        const districts = flatData.filter(item => item.type === 'district');
-        const communes = flatData.filter(item => item.type === 'commune');
-
-        return {
-            provinces,
-            districts,
-            communes,
-            allItems: flatData
-        };
-    }, [flatData]);
-
-    // Search function
-    const search = useCallback((query: string, type?: string) => {
+    const search = useCallback((query: string): FlatItem[] => {
         if (!query.trim()) {
-            return type ? flatData.filter(item => item.type === type) : flatData;
+            return [];
         }
 
-        const lowerQuery = query.toLowerCase();
-        return flatData.filter(item => {
-            const matchesType = !type || item.type === type;
-            const matchesName = item.name.toLowerCase().includes(lowerQuery);
-            const matchesOldNames = item.oldNames.some(name =>
-                name.toLowerCase().includes(lowerQuery)
-            );
-            const matchesFullPath = item.fullPath.toLowerCase().includes(lowerQuery);
-
-            return matchesType && (matchesName || matchesOldNames || matchesFullPath);
+        const lowerQuery = query.toLowerCase().trim();
+        const results = data.filter(item => {
+            return item.searchText.toLowerCase().includes(lowerQuery);
         });
-    }, [flatData]);
+
+        // Sắp xếp kết quả theo độ liên quan
+        return results.sort((a, b) => {
+            // Ưu tiên tên đơn vị mới
+            const aNameMatch = a.newUnit.ward.toLowerCase().includes(lowerQuery);
+            const bNameMatch = b.newUnit.ward.toLowerCase().includes(lowerQuery);
+
+            if (aNameMatch && !bNameMatch) return -1;
+            if (!aNameMatch && bNameMatch) return 1;
+
+            // Ưu tiên tên đơn vị cũ
+            const aOldMatch = a.oldUnits.some(unit =>
+                unit.ward.toLowerCase().includes(lowerQuery)
+            );
+            const bOldMatch = b.oldUnits.some(unit =>
+                unit.ward.toLowerCase().includes(lowerQuery)
+            );
+
+            if (aOldMatch && !bOldMatch) return -1;
+            if (!aOldMatch && bOldMatch) return 1;
+
+            return a.newUnit.ward.localeCompare(b.newUnit.ward);
+        });
+    }, [data]);
 
     return {
-        nestedData,
-        searchData,
         search,
         loading,
-        error
+        error,
+        totalItems: data.length,
+        reload: loadData
     };
-};
+}
+
+function parseAdminData(tsvContent: string): FlatItem[] {
+    const lines = tsvContent.trim().split('\n');
+
+    // Skip header if exists
+    const dataLines = lines.slice(1);
+
+    const rawData: RawDataItem[] = dataLines.map((line, index) => {
+        const cols = line.split('\t');
+        if (cols.length < 6) {
+            console.warn(`Line ${index + 2} has insufficient columns:`, cols);
+            return null;
+        }
+
+        return {
+            newProvince: cols[0]?.trim() || '',
+            newWard: cols[1]?.trim() || '',
+            oldProvince: cols[2]?.trim() || '',
+            oldDistrict: cols[3]?.trim() || '',
+            oldWard: cols[4]?.trim() || '',
+            document: cols[5]?.trim() || ''
+        };
+    }).filter((item): item is RawDataItem => item !== null);
+
+    console.log(`Parsed ${rawData.length} records`);
+
+    // Group by new ward
+    const groupedData = new Map<string, {
+        newProvince: string;
+        newWard: string;
+        oldUnits: RawDataItem[];
+        documents: string[];
+    }>();
+
+    rawData.forEach(item => {
+        const key = `${item.newProvince}|${item.newWard}`;
+
+        if (!groupedData.has(key)) {
+            groupedData.set(key, {
+                newProvince: item.newProvince,
+                newWard: item.newWard,
+                oldUnits: [],
+                documents: []
+            });
+        }
+
+        const group = groupedData.get(key)!;
+        group.oldUnits.push(item);
+
+        // Add document if not already present
+        if (item.document && !group.documents.includes(item.document)) {
+            group.documents.push(item.document);
+        }
+    });
+
+    // Convert to FlatItem[]
+    const searchItems: FlatItem[] = Array.from(groupedData.entries()).map(([, group], index) => {
+        // Extract district from new ward name or use placeholder
+        const newDistrict = extractDistrictFromContext(group.newWard, group.newProvince) || "[Cần bổ sung]";
+
+        const newUnit: AdministrativeUnit = {
+            province: group.newProvince,
+            district: newDistrict,
+            ward: group.newWard
+        };
+
+        const oldUnits: AdministrativeUnit[] = group.oldUnits.map(item => ({
+            province: item.oldProvince || "[Không rõ]",
+            district: item.oldDistrict || "[Không rõ]",
+            ward: item.oldWard || "[Không rõ]"
+        }));
+
+        // Create search text for better searching
+        const searchText = [
+            group.newProvince,
+            newDistrict,
+            group.newWard,
+            ...oldUnits.map(unit => `${unit.province} ${unit.district} ${unit.ward}`)
+        ].join(' ');
+
+        const fullPath = `${group.newProvince} > ${newDistrict} > ${group.newWard}`;
+
+        return {
+            id: `ward_${index}`,
+            name: group.newWard,
+            type: 'commune',
+            newUnit,
+            oldUnits,
+            document: group.documents.join(' | '),
+            fullPath,
+            searchText
+        };
+    });
+
+    console.log(`Generated ${searchItems.length} search items`);
+    return searchItems;
+}
+
+// Helper function to extract district from context
+function extractDistrictFromContext(wardName: string, provinceName: string): string {
+    // This is a simplified approach - in real implementation, you might need
+    // to use a lookup table or more sophisticated parsing
+
+    // Try to extract from ward name patterns
+    const patterns = [
+        /quận\s+([^,]+)/i,
+        /huyện\s+([^,]+)/i,
+        /thị\s+xã\s+([^,]+)/i,
+        /thành\s+phố\s+([^,]+)/i
+    ];
+
+    for (const pattern of patterns) {
+        const match = wardName.match(pattern);
+        if (match) {
+            return match[1].trim();
+        }
+    }
+
+    // Default fallback
+    return "[Cần bổ sung huyện]";
+}

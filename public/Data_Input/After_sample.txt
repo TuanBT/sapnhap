@@ -1,0 +1,3 @@
+STT	Mã tỉnh (BNV)	Tên tỉnh/TP mới	Mã tỉnh (TMS)	Mã Quận huyện TMS (cũ) CQT đã rà soát	Tên Quận huyện TMS (cũ)	Mã phường/xã mới 	Tên Phường/Xã mới
+1	01	Thành phố Hà Nội	101	10105	Quận Hoàn Kiếm	10105001	Phường Hoàn Kiếm
+2411	26	Tỉnh Lâm Đồng	703	71505	Huyện Bắc Bình	71505067	Xã Hải Ninh

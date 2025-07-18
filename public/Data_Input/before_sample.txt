@@ -1,0 +1,3 @@
+No.	Tỉnh/Thành Phố cũ	Mã Tỉnh cũ	Quận/Huyện Cũ	Mã phường xã cũ	Phường Xã Cũ	Mã Phường Xã cũ
+1	Thành phố Hà Nội	01	Quận Ba Đình	001	Phường Phúc Xá	00001
+597	Tỉnh Hà Giang	02	Huyện Quản Bạ	029	Xã Đông Hà	00895

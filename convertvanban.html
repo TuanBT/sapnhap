@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Tách xã/phường</title>
+    <style>
+        textarea { width: 100%; height: 200px; margin-top: 10px; font-family: monospace; }
+        button { margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+<h3>Nhập dữ liệu gốc (cách nhau bằng tab):</h3>
+<textarea id="input"></textarea>
+<button onclick="process()">Tách dữ liệu</button>
+
+<h3>Kết quả (copy dán vào Excel được):</h3>
+<textarea id="output" readonly></textarea>
+
+<script>
+    function process() {
+        const input = document.getElementById('input').value.trim();
+        const lines = input.split('\n');
+        let result = [];
+
+        lines.forEach(line => {
+            const parts = line.split('\t');
+            if (parts.length < 3) return;
+
+            const [province, processedText, originalText] = parts;
+            if (!processedText.includes('->')) return;
+
+            const [left, right] = processedText.split('->').map(s => s.trim());
+            const newWard = right;
+            const oldWards = left.split(',').map(w => w.trim());
+
+            oldWards.forEach(old => {
+                result.push([province, processedText, originalText, old, newWard].join('\t'));
+            });
+        });
+
+        document.getElementById('output').value = result.join('\n');
+    }
+</script>
+
+</body>
+</html>
