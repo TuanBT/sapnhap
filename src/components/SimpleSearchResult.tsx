@@ -35,16 +35,33 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
         return (
             <div key={index} className={`${bgColor} rounded-lg p-3 border ${isOld ? 'border-red-200' : 'border-green-200'}`}>
                 <div className="space-y-1">
-                    <div className={`font-medium ${textColor}`}>
-                        {highlightText(unit.ward, searchQuery)}
+                    {/* Tỉnh/Thành phố - Đậm nhất, lên đầu */}
+                    <div className={`text-sm font-bold ${textColor}`}>
+                        🏛️ {highlightText(unit.province, searchQuery)}
                     </div>
-                    <div className="text-xs space-y-0.5">
-                        <div className={`${textColor} opacity-75`}>
+
+                    {/* Quận/Huyện - Vừa phải, ở giữa */}
+                    {unit.district && unit.district !== "—" && unit.district !== "∅" && (
+                        <div className={`text-sm font-medium ${textColor} opacity-80`}>
                             📍 {highlightText(unit.district, searchQuery)}
                         </div>
-                        <div className={`${textColor} opacity-60`}>
-                            🏛️ {highlightText(unit.province, searchQuery)}
+                    )}
+                    {/* Hiển thị ký hiệu đặc biệt cho trường hợp mới không có quận/huyện */}
+                    {unit.district === "—" && (
+                        <div className={`text-xs ${textColor} opacity-60 italic`}>
+                            📍 (trực thuộc tỉnh)
                         </div>
+                    )}
+                    {/* Hiển thị ký hiệu cho trường hợp cũ thiếu thông tin */}
+                    {unit.district === "∅" && (
+                        <div className={`text-xs ${textColor} opacity-60 italic`}>
+                            📍 (không rõ)
+                        </div>
+                    )}
+
+                    {/* Phường/Xã - Nhạt nhất, ở cuối */}
+                    <div className={`text-xs ${textColor} opacity-70`}>
+                        🏠 {highlightText(unit.ward, searchQuery)}
                     </div>
                 </div>
             </div>
@@ -151,14 +168,26 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {item.oldUnits.map((unit, index) => (
                                         <div key={index} className="bg-gray-50 rounded p-3 border">
-                                            <div className="text-sm font-medium text-gray-800">
-                                                {highlightText(unit.ward, searchQuery)}
-                                            </div>
-                                            <div className="text-xs text-gray-600 mt-1">
-                                                📍 {highlightText(unit.district, searchQuery)}
-                                            </div>
-                                            <div className="text-xs text-gray-500">
+                                            {/* Tỉnh/Thành phố - Đậm nhất */}
+                                            <div className="text-sm font-bold text-gray-800">
                                                 🏛️ {highlightText(unit.province, searchQuery)}
+                                            </div>
+
+                                            {/* Quận/Huyện - Vừa phải */}
+                                            {unit.district && unit.district !== "∅" && (
+                                                <div className="text-sm font-medium text-gray-700 mt-1">
+                                                    📍 {highlightText(unit.district, searchQuery)}
+                                                </div>
+                                            )}
+                                            {unit.district === "∅" && (
+                                                <div className="text-xs text-gray-500 mt-1 italic">
+                                                    📍 (không rõ)
+                                                </div>
+                                            )}
+
+                                            {/* Phường/Xã - Nhạt nhất */}
+                                            <div className="text-xs text-gray-600 mt-1">
+                                                🏠 {highlightText(unit.ward, searchQuery)}
                                             </div>
                                         </div>
                                     ))}
@@ -172,15 +201,28 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
                                     Đơn vị sau sắp xếp:
                                 </h4>
                                 <div className="bg-green-50 rounded p-4 border border-green-200">
-                                    <div className="text-lg font-medium text-green-800">
-                                        {highlightText(item.newUnit.ward, searchQuery)}
-                                    </div>
-                                    <div className="text-sm text-green-700 mt-1">
-                                        📍 {highlightText(item.newUnit.district, searchQuery)}
-                                    </div>
-                                    <div className="text-sm text-green-600">
+                                    {/* Tỉnh/Thành phố - Đậm nhất */}
+                                    <div className="text-lg font-bold text-green-800">
                                         🏛️ {highlightText(item.newUnit.province, searchQuery)}
                                     </div>
+
+                                    {/* Ghi chú không có quận/huyện */}
+                                    <div className="text-sm text-green-600 mt-1 italic">
+                                        📍 (trực thuộc tỉnh/thành phố)
+                                    </div>
+
+                                    {/* Phường/Xã - Nhạt hơn */}
+                                    <div className="text-sm text-green-700 mt-1">
+                                        🏠 {highlightText(item.newUnit.ward, searchQuery)}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Ghi chú về cấu trúc hành chính */}
+                            <div className="bg-blue-50 rounded p-3 border border-blue-200">
+                                <div className="text-xs text-blue-800">
+                                    <strong>Ghi chú:</strong> Sau sắp xếp, đơn vị mới trực thuộc tỉnh/thành phố,
+                                    không còn cấp quận/huyện trung gian.
                                 </div>
                             </div>
 

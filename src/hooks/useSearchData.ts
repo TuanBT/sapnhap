@@ -161,30 +161,26 @@ function parseAdminData(tsvContent: string): FlatItem[] {
 
     // Convert to FlatItem[]
     const searchItems: FlatItem[] = Array.from(groupedData.entries()).map(([, group], index) => {
-        // Extract district from new ward name or use placeholder
-        const newDistrict = extractDistrictFromContext(group.newWard, group.newProvince) || "[Cần bổ sung]";
-
         const newUnit: AdministrativeUnit = {
             province: group.newProvince,
-            district: newDistrict,
+            district: "-", // Em dash để thể hiện không có cấp này
             ward: group.newWard
         };
 
         const oldUnits: AdministrativeUnit[] = group.oldUnits.map(item => ({
-            province: item.oldProvince || "[Không rõ]",
-            district: item.oldDistrict || "[Không rõ]",
-            ward: item.oldWard || "[Không rõ]"
+            province: item.oldProvince || "∅",
+            district: item.oldDistrict || "∅",
+            ward: item.oldWard || "∅"
         }));
 
         // Create search text for better searching
         const searchText = [
             group.newProvince,
-            newDistrict,
             group.newWard,
             ...oldUnits.map(unit => `${unit.province} ${unit.district} ${unit.ward}`)
         ].join(' ');
 
-        const fullPath = `${group.newProvince} > ${newDistrict} > ${group.newWard}`;
+        const fullPath = `${group.newProvince} > ${group.newWard}`;
 
         return {
             id: `ward_${index}`,
@@ -200,28 +196,4 @@ function parseAdminData(tsvContent: string): FlatItem[] {
 
     console.log(`Generated ${searchItems.length} search items`);
     return searchItems;
-}
-
-// Helper function to extract district from context
-function extractDistrictFromContext(wardName: string, provinceName: string): string {
-    // This is a simplified approach - in real implementation, you might need
-    // to use a lookup table or more sophisticated parsing
-
-    // Try to extract from ward name patterns
-    const patterns = [
-        /quận\s+([^,]+)/i,
-        /huyện\s+([^,]+)/i,
-        /thị\s+xã\s+([^,]+)/i,
-        /thành\s+phố\s+([^,]+)/i
-    ];
-
-    for (const pattern of patterns) {
-        const match = wardName.match(pattern);
-        if (match) {
-            return match[1].trim();
-        }
-    }
-
-    // Default fallback
-    return "[Cần bổ sung huyện]";
 }
