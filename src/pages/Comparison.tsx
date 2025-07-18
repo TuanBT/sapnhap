@@ -3,7 +3,6 @@ import { useProvinceData } from '../hooks/useProvinceData';
 import { useMapLogic } from '../hooks/useMapLogic';
 import { SVGMerger } from '../utils/svgMerger';
 import MapDisplay, { type MapDisplayRef } from '../components/MapDisplay';
-import Header from '../components/Header';
 
 const Comparison: React.FC = () => {
     const { provinces, provincesMerged, provinceMapping, mergeInfo, loading, error } = useProvinceData();
@@ -72,9 +71,7 @@ const Comparison: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            <Header />
-
-            <div className="container mx-auto px-4 pb-8 pt-3">
+            <div className="container mx-auto px-4 pb-8 pt-6">
                 {/* Maps */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                     <MapDisplay

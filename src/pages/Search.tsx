@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { useSearchData } from '../hooks/useSearchData';
 import SearchHeader from '../components/SearchHeader';
 import SearchResults from '../components/SearchResults';
-import Header from '../components/Header';
+// Xóa import Header vì đã có trong Home.tsx
 
 const Search: React.FC = () => {
     const { search, loading, error, totalItems } = useSearchData();
@@ -58,21 +58,17 @@ const Search: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <Header />
+        <div className="container mx-auto px-4 py-6 max-w-4xl">
+            <SearchHeader
+                onSearch={handleSearch}
+                totalItems={totalItems}
+                isSearching={isSearching}
+            />
 
-            <div className="container mx-auto px-4 py-6 max-w-4xl">
-                <SearchHeader
-                    onSearch={handleSearch}
-                    totalItems={totalItems}
-                    isSearching={isSearching}
-                />
-
-                <SearchResults
-                    results={results}
-                    searchQuery={searchQuery}
-                />
-            </div>
+            <SearchResults
+                results={results}
+                searchQuery={searchQuery}
+            />
         </div>
     );
 };

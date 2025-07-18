@@ -1,12 +1,32 @@
+
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const Header: React.FC = () => {
     return (
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-5 text-center shadow-lg">
-            <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
-                🇻🇳 Bản đồ Việt Nam trước sau Sáp nhập
-            </h1>
-        </div>
+        <nav className="bg-white shadow-md">
+            <div className="container mx-auto px-4">
+                <div className="flex justify-between items-center py-4">
+                    <Link to="/" className="text-xl font-bold text-blue-600">
+                        Vietnam Map
+                    </Link>
+                    <div className="flex space-x-4">
+                        <Link
+                            to="/"
+                            className="text-gray-700 hover:text-blue-600 transition-colors"
+                        >
+                            Trang chính
+                        </Link>
+                        <Link
+                            to="/comparison"
+                            className="text-gray-700 hover:text-blue-600 transition-colors"
+                        >
+                            So sánh
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        </nav>
     );
 };
 
