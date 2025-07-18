@@ -36,7 +36,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
                 <input
                     type="text"
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="Nhập tên phường/xã cũ hoặc mới để tìm kiếm..."
+                    placeholder="Nhập tên phường/xã cũ hoặc mới để tìm kiếm... (không cần dấu)"
                     value={searchQuery}
                     onChange={(e) => onSearchChange(e.target.value)}
                 />
@@ -44,7 +44,10 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({
 
             <div className="mt-4 text-center">
                 <p className="text-sm text-gray-500">
-                    💡 Gợi ý: Bạn có thể tìm theo tên cũ hoặc mới, tên tỉnh/thành phố
+                    💡 <strong>Tìm kiếm thông minh:</strong> Không phân biệt hoa thường, có hoặc không dấu
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                    Ví dụ: "ninh kieu", "Ninh Kiều", "ninh kiêu" đều cho kết quả giống nhau
                 </p>
             </div>
         </div>
