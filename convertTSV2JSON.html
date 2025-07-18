@@ -238,19 +238,19 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
                 if (!changeGroups.has(groupKey)) {
                     changeGroups.set(groupKey, {
                         id: `change-${currentId++}`,
-                        newProvince: cleanText(newProvince),
-                        newWard: cleanText(newWard),
+                        newProvince: normalizeText(newProvince),
+                        newWard: normalizeText(newWard),
                         oldUnits: [],
-                        document: cleanText(document || ''),
+                        document: normalizeText(document || ''),
                         type: 'merge'
                     });
                 }
 
                 const group = changeGroups.get(groupKey);
                 group.oldUnits.push({
-                    province: cleanText(oldProvince || newProvince),
-                    district: cleanText(oldDistrict || ''),
-                    ward: cleanText(oldWard)
+                    province: normalizeText(oldProvince || newProvince),
+                    district: normalizeText(oldDistrict || ''),
+                    ward: normalizeText(oldWard)
                 });
             }
 
@@ -314,12 +314,13 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
         }
     }
 
-    function cleanText(text) {
+    // Sửa hàm normalizeText để KHÔNG bỏ prefix hành chính
+    function normalizeText(text) {
         if (!text) return '';
         return text.trim()
             .replace(/\s+/g, ' ')  // Multiple spaces to single space
-            .replace(/^(phường|xã|thị trấn)\s+/i, '')  // Remove prefixes
-            .replace(/\s+(phường|xã|thị trấn)$/i, ''); // Remove suffixes
+            .normalize('NFC');     // Normalize unicode
+        // KHÔNG bỏ prefix như "phường", "xã", "thị trấn"
     }
 
     function showPreview(data) {

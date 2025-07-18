@@ -12,17 +12,15 @@ export interface FlatItem {
     id: string;
     name: string;
     type: 'commune';
-
-    // Thông tin mới (sau sắp xếp)
     newUnit: AdministrativeUnit;
-
-    // Thông tin cũ (trước sắp xếp)
     oldUnits: AdministrativeUnit[];
-
-    // Metadata
     document: string;
     fullPath: string;
-    searchText: string; // Để tìm kiếm
+    searchText: string;
+    // Thêm indexed search fields
+    searchTerms: string[];
+    newWardLower: string;
+    oldWardsLower: string[];
 }
 
 export function useSearchData() {
@@ -36,11 +34,22 @@ export function useSearchData() {
             setError(null);
 
             const searchItems = await loadSearchData();
-            // Convert SearchItem[] to FlatItem[] if needed
-            const flatItems: FlatItem[] = searchItems.map(item => ({
-                ...item,
-                // Add any additional transformations if needed
-            }));
+
+            // Tối ưu data với pre-computed search fields
+            const flatItems: FlatItem[] = searchItems.map(item => {
+                const searchTerms = [
+                    item.newUnit.province,
+                    item.newUnit.ward,
+                    ...item.oldUnits.map(unit => `${unit.province} ${unit.district} ${unit.ward}`)
+                ];
+
+                return {
+                    ...item,
+                    searchTerms,
+                    newWardLower: item.newUnit.ward.toLowerCase(),
+                    oldWardsLower: item.oldUnits.map(unit => unit.ward.toLowerCase()),
+                };
+            });
 
             setData(flatItems);
         } catch (err) {
@@ -55,32 +64,50 @@ export function useSearchData() {
         loadData();
     }, [loadData]);
 
+    // Tối ưu search với early returns và pre-computed values
     const search = useCallback((query: string): FlatItem[] => {
         if (!query.trim()) {
             return [];
         }
 
         const lowerQuery = query.toLowerCase().trim();
-        const results = data.filter(item => {
-            return item.searchText.toLowerCase().includes(lowerQuery);
-        });
+        const results: FlatItem[] = [];
 
-        // Sắp xếp kết quả theo độ liên quan
+        // Sử dụng for loop thay vì filter cho performance tốt hơn
+        for (let i = 0; i < data.length; i++) {
+            const item = data[i];
+
+            // Quick check với pre-computed fields
+            if (item.newWardLower.includes(lowerQuery) ||
+                item.oldWardsLower.some(ward => ward.includes(lowerQuery)) ||
+                item.searchText.toLowerCase().includes(lowerQuery)) {
+                results.push(item);
+            }
+        }
+
+        // Tối ưu sorting
         return results.sort((a, b) => {
-            // Ưu tiên tên đơn vị mới
-            const aNameMatch = a.newUnit.ward.toLowerCase().includes(lowerQuery);
-            const bNameMatch = b.newUnit.ward.toLowerCase().includes(lowerQuery);
+            // Exact match có priority cao nhất
+            if (a.newWardLower === lowerQuery) return -1;
+            if (b.newWardLower === lowerQuery) return 1;
+
+            // Starts with có priority cao
+            const aStartsWith = a.newWardLower.startsWith(lowerQuery);
+            const bStartsWith = b.newWardLower.startsWith(lowerQuery);
+
+            if (aStartsWith && !bStartsWith) return -1;
+            if (!aStartsWith && bStartsWith) return 1;
+
+            // Tên đơn vị mới match
+            const aNameMatch = a.newWardLower.includes(lowerQuery);
+            const bNameMatch = b.newWardLower.includes(lowerQuery);
 
             if (aNameMatch && !bNameMatch) return -1;
             if (!aNameMatch && bNameMatch) return 1;
 
-            // Ưu tiên tên đơn vị cũ
-            const aOldMatch = a.oldUnits.some(unit =>
-                unit.ward.toLowerCase().includes(lowerQuery)
-            );
-            const bOldMatch = b.oldUnits.some(unit =>
-                unit.ward.toLowerCase().includes(lowerQuery)
-            );
+            // Tên đơn vị cũ match
+            const aOldMatch = a.oldWardsLower.some(ward => ward.includes(lowerQuery));
+            const bOldMatch = b.oldWardsLower.some(ward => ward.includes(lowerQuery));
 
             if (aOldMatch && !bOldMatch) return -1;
             if (!aOldMatch && bOldMatch) return 1;

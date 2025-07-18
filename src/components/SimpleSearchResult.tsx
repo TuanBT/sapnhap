@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHome, faArrowRight, faEye, faEyeSlash, faFileText, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 import type { FlatItem, AdministrativeUnit } from '../hooks/useSearchData';
@@ -8,84 +8,80 @@ interface SimpleSearchResultProps {
     searchQuery: string;
 }
 
-const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQuery }) => {
+const SimpleSearchResult: React.FC<SimpleSearchResultProps> = memo(({ item, searchQuery }) => {
     const [showDetails, setShowDetails] = useState(false);
 
-    const highlightText = (text: string, query: string) => {
-        if (!query.trim()) return text;
+    // Memoize highlight function
+    const highlightText = useMemo(() => {
+        return (text: string, query: string) => {
+            if (!query.trim()) return text;
 
-        const regex = new RegExp(`(${query})`, 'gi');
-        const parts = text.split(regex);
+            const regex = new RegExp(`(${query})`, 'gi');
+            const parts = text.split(regex);
 
-        return parts.map((part, index) =>
-            regex.test(part) ? (
-                <mark key={index} className="bg-yellow-200 px-1 rounded">
-                    {part}
-                </mark>
-            ) : (
-                part
-            )
-        );
-    };
+            return parts.map((part, index) =>
+                regex.test(part) ? (
+                    <mark key={index} className="bg-yellow-200 px-1 rounded">
+                        {part}
+                    </mark>
+                ) : (
+                    part
+                )
+            );
+        };
+    }, []);
 
-    const renderAdministrativeUnit = (unit: AdministrativeUnit, isOld: boolean, index?: number) => {
-        const bgColor = isOld ? 'bg-red-50' : 'bg-green-50';
-        const textColor = isOld ? 'text-red-700' : 'text-green-700';
+    // Memoize relevant old units
+    const relevantOldUnits = useMemo(() => {
+        if (!searchQuery.trim()) return item.oldUnits.slice(0, 3);
 
-        return (
-            <div key={index} className={`${bgColor} rounded-lg p-3 border ${isOld ? 'border-red-200' : 'border-green-200'}`}>
-                <div className="space-y-1">
-                    {/* Tỉnh/Thành phố - Đậm nhất, lên đầu */}
-                    <div className={`text-sm font-bold ${textColor}`}>
-                        🏛️ {highlightText(unit.province, searchQuery)}
-                    </div>
-
-                    {/* Quận/Huyện - Vừa phải, ở giữa */}
-                    {unit.district && unit.district !== "—" && unit.district !== "∅" && (
-                        <div className={`text-sm font-medium ${textColor} opacity-80`}>
-                            📍 {highlightText(unit.district, searchQuery)}
-                        </div>
-                    )}
-                    {/* Hiển thị ký hiệu đặc biệt cho trường hợp mới không có quận/huyện */}
-                    {unit.district === "—" && (
-                        <div className={`text-xs ${textColor} opacity-60 italic`}>
-                            📍 (trực thuộc tỉnh)
-                        </div>
-                    )}
-                    {/* Hiển thị ký hiệu cho trường hợp cũ thiếu thông tin */}
-                    {unit.district === "∅" && (
-                        <div className={`text-xs ${textColor} opacity-60 italic`}>
-                            📍 (không rõ)
-                        </div>
-                    )}
-
-                    {/* Phường/Xã - Nhạt nhất, ở cuối */}
-                    <div className={`text-xs ${textColor} opacity-70`}>
-                        🏠 {highlightText(unit.ward, searchQuery)}
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const getRelevantOldUnits = (oldUnits: AdministrativeUnit[], query: string) => {
-        if (!query.trim()) return oldUnits.slice(0, 3);
-
-        const lowerQuery = query.toLowerCase();
-        const relevantUnits = oldUnits.filter(unit =>
+        const lowerQuery = searchQuery.toLowerCase();
+        const relevantUnits = item.oldUnits.filter(unit =>
             unit.ward.toLowerCase().includes(lowerQuery) ||
             unit.district.toLowerCase().includes(lowerQuery) ||
             unit.province.toLowerCase().includes(lowerQuery)
         );
 
-        if (relevantUnits.length > 0) {
-            return relevantUnits.slice(0, 3);
-        }
+        return relevantUnits.length > 0 ? relevantUnits.slice(0, 3) : item.oldUnits.slice(0, 3);
+    }, [item.oldUnits, searchQuery]);
 
-        return oldUnits.slice(0, 3);
-    };
+    const renderAdministrativeUnit = useMemo(() => {
+        return (unit: AdministrativeUnit, isOld: boolean, index?: number) => {
+            const bgColor = isOld ? 'bg-red-50' : 'bg-green-50';
+            const textColor = isOld ? 'text-red-700' : 'text-green-700';
 
-    const relevantOldUnits = getRelevantOldUnits(item.oldUnits, searchQuery);
+            return (
+                <div key={index} className={`${bgColor} rounded-lg p-3 border ${isOld ? 'border-red-200' : 'border-green-200'}`}>
+                    <div className="space-y-1">
+                        <div className={`text-sm font-bold ${textColor}`}>
+                            🏛️ {highlightText(unit.province, searchQuery)}
+                        </div>
+
+                        {unit.district && unit.district !== "—" && unit.district !== "∅" && (
+                            <div className={`text-sm font-medium ${textColor} opacity-80`}>
+                                📍 {highlightText(unit.district, searchQuery)}
+                            </div>
+                        )}
+                        {unit.district === "—" && (
+                            <div className={`text-xs ${textColor} opacity-60 italic`}>
+                                📍 (trực thuộc tỉnh)
+                            </div>
+                        )}
+                        {unit.district === "∅" && (
+                            <div className={`text-xs ${textColor} opacity-60 italic`}>
+                                📍 (không rõ)
+                            </div>
+                        )}
+
+                        <div className={`text-xs ${textColor} opacity-70`}>
+                            🏠 {highlightText(unit.ward, searchQuery)}
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+    }, [highlightText, searchQuery]);
+
     const hasMoreUnits = item.oldUnits.length > 3;
 
     return (
@@ -155,11 +151,10 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
                     </div>
                 </div>
 
-                {/* Expandable Details */}
+                {/* Details section - only render when expanded */}
                 {showDetails && (
                     <div className="mt-6 pt-4 border-t border-gray-200">
                         <div className="space-y-6">
-                            {/* Tất cả đơn vị cũ */}
                             <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-red-500" />
@@ -168,12 +163,10 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {item.oldUnits.map((unit, index) => (
                                         <div key={index} className="bg-gray-50 rounded p-3 border">
-                                            {/* Tỉnh/Thành phố - Đậm nhất */}
                                             <div className="text-sm font-bold text-gray-800">
                                                 🏛️ {highlightText(unit.province, searchQuery)}
                                             </div>
 
-                                            {/* Quận/Huyện - Vừa phải */}
                                             {unit.district && unit.district !== "∅" && (
                                                 <div className="text-sm font-medium text-gray-700 mt-1">
                                                     📍 {highlightText(unit.district, searchQuery)}
@@ -185,7 +178,6 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
                                                 </div>
                                             )}
 
-                                            {/* Phường/Xã - Nhạt nhất */}
                                             <div className="text-xs text-gray-600 mt-1">
                                                 🏠 {highlightText(unit.ward, searchQuery)}
                                             </div>
@@ -194,31 +186,24 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
                                 </div>
                             </div>
 
-                            {/* Đơn vị mới chi tiết */}
                             <div>
                                 <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                                     <FontAwesomeIcon icon={faMapMarkerAlt} className="text-green-500" />
                                     Đơn vị sau sắp xếp:
                                 </h4>
                                 <div className="bg-green-50 rounded p-4 border border-green-200">
-                                    {/* Tỉnh/Thành phố - Đậm nhất */}
                                     <div className="text-lg font-bold text-green-800">
                                         🏛️ {highlightText(item.newUnit.province, searchQuery)}
                                     </div>
-
-                                    {/* Ghi chú không có quận/huyện */}
                                     <div className="text-sm text-green-600 mt-1 italic">
                                         📍 (trực thuộc tỉnh/thành phố)
                                     </div>
-
-                                    {/* Phường/Xã - Nhạt hơn */}
                                     <div className="text-sm text-green-700 mt-1">
                                         🏠 {highlightText(item.newUnit.ward, searchQuery)}
                                     </div>
                                 </div>
                             </div>
 
-                            {/* Ghi chú về cấu trúc hành chính */}
                             <div className="bg-blue-50 rounded p-3 border border-blue-200">
                                 <div className="text-xs text-blue-800">
                                     <strong>Ghi chú:</strong> Sau sắp xếp, đơn vị mới trực thuộc tỉnh/thành phố,
@@ -226,7 +211,6 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
                                 </div>
                             </div>
 
-                            {/* Văn bản pháp lý */}
                             {item.document && (
                                 <div>
                                     <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
@@ -246,6 +230,8 @@ const SimpleSearchResult: React.FC<SimpleSearchResultProps> = ({ item, searchQue
             </div>
         </div>
     );
-};
+});
+
+SimpleSearchResult.displayName = 'SimpleSearchResult';
 
 export default SimpleSearchResult;

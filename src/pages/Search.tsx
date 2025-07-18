@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useSearchData } from '../hooks/useSearchData';
+import { useDebounce } from '../hooks/useDebounce';
 import SearchHeader from '../components/SearchHeader';
 import SearchResults from '../components/SearchResults';
 import Header from '../components/Header';
@@ -8,9 +9,12 @@ const Search: React.FC = () => {
     const { search, loading, error, totalItems } = useSearchData();
     const [searchQuery, setSearchQuery] = useState('');
 
+    // Debounce search query để tránh search liên tục
+    const debouncedSearchQuery = useDebounce(searchQuery, 200);
+
     const filteredResults = useMemo(() => {
-        return search(searchQuery);
-    }, [search, searchQuery]);
+        return search(debouncedSearchQuery);
+    }, [search, debouncedSearchQuery]);
 
     if (loading) {
         return (
@@ -50,7 +54,7 @@ const Search: React.FC = () => {
 
                 <SearchResults
                     results={filteredResults}
-                    searchQuery={searchQuery}
+                    searchQuery={debouncedSearchQuery}
                 />
             </div>
         </div>

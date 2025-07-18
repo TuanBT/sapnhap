@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 import type { FlatItem } from '../hooks/useSearchData';
@@ -10,6 +10,13 @@ interface SearchResultsProps {
 }
 
 const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) => {
+    // Limit results để tránh render quá nhiều components
+    const limitedResults = useMemo(() => {
+        return results.slice(0, 50); // Chỉ hiển thị 50 kết quả đầu
+    }, [results]);
+
+    const hasMoreResults = results.length > 50;
+
     if (!searchQuery.trim()) {
         return (
             <div className="text-center py-16">
@@ -42,15 +49,26 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
         <div className="space-y-4">
             <div className="text-sm text-gray-600 mb-4">
                 Tìm thấy <span className="font-medium text-blue-600">{results.length}</span> kết quả
+                {hasMoreResults && (
+                    <span className="text-orange-600 ml-2">
+                        (hiển thị 50 kết quả đầu)
+                    </span>
+                )}
             </div>
 
-            {results.map((item) => (
+            {limitedResults.map((item) => (
                 <SimpleSearchResult
                     key={item.id}
                     item={item}
                     searchQuery={searchQuery}
                 />
             ))}
+
+            {hasMoreResults && (
+                <div className="text-center py-4 text-sm text-gray-500">
+                    Có {results.length - 50} kết quả khác. Hãy sử dụng từ khóa cụ thể hơn để tìm kiếm chính xác.
+                </div>
+            )}
         </div>
     );
 };

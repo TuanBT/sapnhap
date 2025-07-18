@@ -38,23 +38,26 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
     console.log(`Loading ${jsonData.metadata.totalChanges} changes from JSON`);
 
     const searchItems: SearchItem[] = jsonData.changes.map((change) => {
-        // Clean text helper function
-        const cleanText = (text: string) => {
-            return text.replace(/^(phường|xã|thị trấn)\s+/i, '').trim();
+        // Normalize text helper function - KHÔNG bỏ prefix hành chính
+        const normalizeText = (text: string) => {
+            if (!text) return '';
+            return text.trim()
+                .replace(/\s+/g, ' ')  // Multiple spaces to single space
+                .normalize('NFC');     // Normalize unicode
         };
 
-        // Create new unit
+        // Create new unit - giữ nguyên prefix
         const newUnit: AdministrativeUnit = {
-            province: cleanText(change.newUnit.province),
+            province: normalizeText(change.newUnit.province),
             district: change.newUnit.district,
-            ward: cleanText(change.newUnit.ward)
+            ward: normalizeText(change.newUnit.ward)
         };
 
-        // Create old units
+        // Create old units - giữ nguyên prefix
         const oldUnits: AdministrativeUnit[] = change.oldUnits.map(unit => ({
-            province: unit.province || "∅",
+            province: normalizeText(unit.province) || "∅",
             district: unit.district || "∅",
-            ward: cleanText(unit.ward) || "∅"
+            ward: normalizeText(unit.ward) || "∅"
         }));
 
         // Create search text for better searching
