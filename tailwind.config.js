@@ -4,15 +4,18 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
-      colors: {
-        primary: '#667eea',
-        secondary: '#764ba2',
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       animation: {
-        pulse: 'pulse 0.6s ease-in-out',
-      }
+        fadeIn: 'fadeIn 0.3s ease-out',
+      },
     },
   },
   plugins: [],

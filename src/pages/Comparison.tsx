@@ -49,10 +49,10 @@ const Comparison: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Đang tải dữ liệu...</p>
+                    <p className="text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
                 </div>
             </div>
         );
@@ -60,17 +60,17 @@ const Comparison: React.FC = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-red-500 text-6xl mb-4">⚠️</div>
-                    <p className="text-red-600 text-lg">Lỗi: {error}</p>
+                    <p className="text-red-600 dark:text-red-400 text-lg">Lỗi: {error}</p>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
             <div className="container mx-auto px-4 pb-8 pt-6">
                 {/* Maps */}
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">

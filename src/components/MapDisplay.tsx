@@ -2,7 +2,7 @@ import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 
 interface MapDisplayProps {
     title: string;
-    subtitle?: string; // Thêm subtitle cho thông tin chi tiết
+    subtitle?: string;
     count: number;
     backgroundColor: string;
     onProvinceHover: (element: SVGElement, mapType: 'before' | 'merged') => void;
@@ -63,7 +63,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         const svg = mapRef.current.querySelector('svg');
         if (!svg) return;
 
-        // Add styles - Remove transition để tránh conflict khi programmatically change style
+        // Add styles with dark mode support
         const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
         style.textContent = `
             path, g[id*="VN-"] {
@@ -71,11 +71,30 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                 stroke: #9ca3af;
                 stroke-width: 0.5;
                 cursor: pointer;
+                transition: fill 0.2s ease, stroke 0.2s ease;
             }
             path:hover, g[id*="VN-"]:hover {
                 fill: #3b82f6;
                 stroke: #1e40af;
                 stroke-width: 1;
+            }
+            @media (prefers-color-scheme: dark) {
+                path, g[id*="VN-"] {
+                    fill: #4b5563;
+                    stroke: #6b7280;
+                }
+                path:hover, g[id*="VN-"]:hover {
+                    fill: #60a5fa;
+                    stroke: #3b82f6;
+                }
+            }
+            .dark path, .dark g[id*="VN-"] {
+                fill: #4b5563;
+                stroke: #6b7280;
+            }
+            .dark path:hover, .dark g[id*="VN-"]:hover {
+                fill: #60a5fa;
+                stroke: #3b82f6;
             }
         `;
         svg.insertBefore(style, svg.firstChild);
@@ -100,7 +119,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
     };
 
     return (
-        <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-colors duration-200">
             <div className={`${backgroundColor} text-white p-4`}>
                 <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -117,10 +136,10 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
             <div className="p-4">
                 <div
                     ref={mapRef}
-                    className="w-full h-96 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300"
+                    className="w-full h-96 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-600 transition-colors duration-200"
                     style={{ minHeight: '384px' }}
                 >
-                    <div className="text-gray-500">Đang tải bản đồ...</div>
+                    <div className="text-gray-500 dark:text-gray-400">Đang tải bản đồ...</div>
                 </div>
             </div>
         </div>
