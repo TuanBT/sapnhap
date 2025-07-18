@@ -97,8 +97,31 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({ onSearch, totalItems, isSea
             </form>
 
             {/* Quick tips */}
-            <div className="mt-4 text-xs text-gray-500 dark:text-gray-400">
-                <p>💡 Mẹo: Có thể tìm kiếm bằng tên cũ hoặc tên mới của đơn vị hành chính</p>
+            <div className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                <div className="flex items-center space-x-3 mb-3">
+                    <FontAwesomeIcon
+                        icon={faSearch}
+                        className="text-blue-500 dark:text-blue-400"
+                    />
+                    <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                        Mẹo tìm kiếm
+                    </h3>
+                </div>
+
+                <div className="space-y-2 text-xs text-blue-700 dark:text-blue-300">
+                    <div className="flex items-center space-x-2">
+                        <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                        <span>Có thể tìm theo tên cũ hoặc tên mới</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                        <span>Gõ được có dấu hoặc không dấu</span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <span className="w-1 h-1 bg-blue-400 rounded-full"></span>
+                        <span>Chỉ cần nhập tên không cần loại đơn vị</span>
+                    </div>
+                </div>
             </div>
         </div>
     );

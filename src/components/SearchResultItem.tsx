@@ -186,9 +186,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {/*<span className="text-xs text-gray-500 dark:text-gray-400">
                             {sortedOldUnits.length} → 1
-                        </span>
+                        </span>*/}
                         <button
                             onClick={() => setShowDetails(!showDetails)}
                             className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center space-x-1"
@@ -255,8 +255,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                         <div className="space-y-4">
                             {/* All old units */}
                             <div>
-                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                    Tất cả các đơn vị trước sắp xếp
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center space-x-2">
+                                    <FontAwesomeIcon icon={faMapPin} className="text-gray-500"/>
+                                    <span>Tất cả {sortedOldUnits.length} đơn vị trước sắp xếp</span>
                                 </h4>
                                 <div className="space-y-2">
                                     {sortedOldUnits.map((unit: AdministrativeUnit, index: number) => (
@@ -278,12 +279,14 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                             {item.document && (
                                 <div>
                                     <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center space-x-2">
-                                        <FontAwesomeIcon icon={faFileText} className="text-gray-500" />
-                                        <span>Văn bản sắp xếp</span>
+                                        <FontAwesomeIcon icon={faFileText} className="text-gray-500"/>
+                                        <span>Sắp xếp các đơn vị hành chính cấp xã của {newUnit.province}</span>
                                     </h4>
-                                    <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3">
-                                        {item.document}
+                                    <div
+                                        className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3 space-y-2">
+                                        <div className="text-gray-600 dark:text-gray-400">{item.document}</div>
                                     </div>
+                                    <span className="text-xs text-gray-500"></span>
                                 </div>
                             )}
                         </div>

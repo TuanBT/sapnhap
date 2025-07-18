@@ -9,14 +9,14 @@ const Home: React.FC = () => {
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
             {/* Tab Navigation */}
             <div className="container mx-auto px-4 pt-6">
-                <div className="flex space-x-1 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm max-w-md mx-auto">
+                <div className="flex bg-white dark:bg-gray-800 rounded-2xl p-1.5 shadow-md max-w-sm mx-auto">
                     <button
                         onClick={() => setActiveTab('search')}
                         className={`
-                            flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200
+                            flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all duration-300
                             ${activeTab === 'search'
-                            ? 'bg-blue-500 text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                         }
                         `}
                     >
@@ -25,10 +25,10 @@ const Home: React.FC = () => {
                     <button
                         onClick={() => setActiveTab('comparison')}
                         className={`
-                            flex-1 py-2 px-4 rounded-md font-medium transition-all duration-200
+                            flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all duration-300
                             ${activeTab === 'comparison'
-                            ? 'bg-blue-500 text-white shadow-sm'
-                            : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700'
+                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
                         }
                         `}
                     >
