@@ -3,6 +3,8 @@ import { useProvinceData } from '../hooks/useProvinceData';
 import { useMapLogic } from '../hooks/useMapLogic';
 import { SVGMerger } from '../utils/svgMerger';
 import MapDisplay, { type MapDisplayRef } from '../components/MapDisplay';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
 const Comparison: React.FC = () => {
     const { provinces, provincesMerged, provinceMapping, mergeInfo, loading, error } = useProvinceData();
@@ -51,7 +53,10 @@ const Comparison: React.FC = () => {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                    <FontAwesomeIcon
+                        icon={faSpinner}
+                        className="text-4xl text-blue-500 animate-spin mb-4"
+                    />
                     <p className="text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
                 </div>
             </div>
@@ -62,7 +67,10 @@ const Comparison: React.FC = () => {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-red-500 text-6xl mb-4">⚠️</div>
+                    <FontAwesomeIcon
+                        icon={faExclamationTriangle}
+                        className="text-4xl text-red-500 mb-4"
+                    />
                     <p className="text-red-600 dark:text-red-400 text-lg">Lỗi: {error}</p>
                 </div>
             </div>
@@ -81,7 +89,7 @@ const Comparison: React.FC = () => {
                             ? `${allRelatedProvinces}`
                             : ''}
                         count={provinces ? Object.keys(provinces).length : 0}
-                        backgroundColor="bg-blue-500"
+                        backgroundColor="bg-blue-600"
                         onProvinceHover={handleProvinceHover}
                         onProvinceLeave={handleProvinceLeave}
                         svgUrl="/vn.svg"
@@ -95,7 +103,7 @@ const Comparison: React.FC = () => {
                             ? `${allRelatedProvinces}`
                             : ''}
                         count={provincesMerged ? Object.keys(provincesMerged).length : 0}
-                        backgroundColor="bg-green-500"
+                        backgroundColor="bg-green-600"
                         onProvinceHover={handleProvinceHover}
                         onProvinceLeave={handleProvinceLeave}
                         svgUrl="/vn2.svg"

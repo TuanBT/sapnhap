@@ -2,6 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { useSearchData } from '../hooks/useSearchData';
 import SearchHeader from '../components/SearchHeader';
 import SearchResults from '../components/SearchResults';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
 const Search: React.FC = () => {
     const { search, loading, error, totalItems } = useSearchData();
@@ -29,7 +31,10 @@ const Search: React.FC = () => {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                    <FontAwesomeIcon
+                        icon={faSpinner}
+                        className="text-4xl text-blue-500 animate-spin mb-4"
+                    />
                     <p className="text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
                 </div>
             </div>
@@ -40,7 +45,10 @@ const Search: React.FC = () => {
         return (
             <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
-                    <div className="text-red-500 text-4xl mb-4">⚠️</div>
+                    <FontAwesomeIcon
+                        icon={faExclamationTriangle}
+                        className="text-4xl text-red-500 mb-4"
+                    />
                     <p className="text-red-600 dark:text-red-400">Lỗi: {error}</p>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                         Vui lòng đảm bảo file thongtinhanhchinh.json có trong thư mục public
