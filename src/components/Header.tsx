@@ -43,10 +43,10 @@ const Header: React.FC = () => {
                         </div>
                         <div>
                             <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                                Sắp nhập DVHC
+                                Sáp nhập
                             </h1>
                             <p className="text-xs text-gray-500 dark:text-gray-400">
-                                Đơn vị hành chính Việt Nam
+                                Đơn vị hành chính Việt Nam 2025
                             </p>
                         </div>
                     </Link>

@@ -4,9 +4,8 @@ import { normalizeForSearch } from '../utils/searchUtils';
 import type { SearchItem, BaseSearchItem } from '../types/administrative';
 
 export interface FlatSearchItem extends BaseSearchItem {
-    // Simplified search fields
     normalizedSearchText: string;
-    // Thêm các fields từ SearchItem
+    originalSearchText: string;
     newUnit?: any;
     oldUnits?: any[];
     document?: string;
@@ -28,13 +27,14 @@ export function useSearchData() {
 
             const searchItems = await loadSearchData();
 
-            // Tối ưu data với pre-computed search fields
             const flatItems: FlatSearchItem[] = searchItems.map((item: SearchItem) => {
                 const normalizedSearchText = normalizeForSearch(item.searchText);
+                const originalSearchText = item.searchText.toLowerCase().trim();
 
                 return {
                     ...item,
                     normalizedSearchText,
+                    originalSearchText,
                 } as FlatSearchItem;
             });
 
@@ -51,11 +51,51 @@ export function useSearchData() {
         loadData();
     }, [loadData]);
 
-    // Detect level from query - CHỈ KHI CÓ PREFIX RÕ RÀNG Ở ĐẦU
+    const calculateAccentScore = useCallback((query: string, target: string): number => {
+        const queryLower = query.toLowerCase().trim();
+        const targetLower = target.toLowerCase().trim();
+
+        if (queryLower === targetLower) {
+            return 100;
+        }
+
+        const queryWords = queryLower.split(/\s+/);
+        const targetWords = targetLower.split(/\s+/);
+
+        let totalScore = 0;
+        let matchedWords = 0;
+
+        for (const queryWord of queryWords) {
+            let bestWordScore = 0;
+
+            for (const targetWord of targetWords) {
+                if (queryWord === targetWord) {
+                    bestWordScore = 100;
+                    break;
+                }
+                else if (targetWord.includes(queryWord)) {
+                    bestWordScore = Math.max(bestWordScore, 95);
+                }
+                else if (normalizeForSearch(queryWord) === normalizeForSearch(targetWord)) {
+                    bestWordScore = Math.max(bestWordScore, 70);
+                }
+                else if (normalizeForSearch(targetWord).includes(normalizeForSearch(queryWord))) {
+                    bestWordScore = Math.max(bestWordScore, 50);
+                }
+            }
+
+            if (bestWordScore > 0) {
+                totalScore += bestWordScore;
+                matchedWords++;
+            }
+        }
+
+        return matchedWords > 0 ? Math.round(totalScore / queryWords.length) : 0;
+    }, []);
+
     const detectAdministrativeLevel = useCallback((query: string): { level: 'province' | 'district' | 'commune' | 'all', cleanQuery: string } => {
         const normalizedQuery = normalizeForSearch(query);
 
-        // CHỈ detect level khi có prefix rõ ràng ở đầu VÀ theo sau là khoảng trắng
         if (normalizedQuery.match(/^tinh\s+/)) {
             const cleanQuery = normalizedQuery.replace(/^tinh\s+/, '');
             return { level: 'province', cleanQuery };
@@ -71,15 +111,13 @@ export function useSearchData() {
             return { level: 'commune', cleanQuery };
         }
 
-        // Không có prefix rõ ràng - giữ nguyên query và tìm tất cả
         return { level: 'all', cleanQuery: normalizedQuery };
     }, []);
 
-    // Hàm tách loại hình đơn vị và tên
-    const parseAdministrativeText = useCallback((text: string): { type: string; name: string } => {
+    const parseAdministrativeText = useCallback((text: string): { type: string; name: string; originalText: string } => {
+        const originalText = text.toLowerCase().trim();
         const normalized = normalizeForSearch(text);
 
-        // Các pattern để tách loại hình
         const patterns = [
             { regex: /^(xa)\s+(.+)$/, type: 'xa' },
             { regex: /^(phuong)\s+(.+)$/, type: 'phuong' },
@@ -94,28 +132,65 @@ export function useSearchData() {
         for (const pattern of patterns) {
             const match = normalized.match(pattern.regex);
             if (match) {
-                return { type: match[1], name: match[2] };
+                return { type: match[1], name: match[2], originalText };
             }
         }
 
-        return { type: '', name: normalized };
+        return { type: '', name: normalized, originalText };
     }, []);
 
-    // Hàm kiểm tra exact match có phân biệt loại hình
     const isExactAdministrativeMatch = useCallback((queryText: string, targetText: string): boolean => {
         const queryParsed = parseAdministrativeText(queryText);
         const targetParsed = parseAdministrativeText(targetText);
 
-        // Nếu query có loại hình cụ thể, phải match chính xác cả loại hình và tên
         if (queryParsed.type) {
             return queryParsed.type === targetParsed.type && queryParsed.name === targetParsed.name;
+        } else {
+            return queryParsed.name === targetParsed.name;
         }
-
-        // Nếu query không có loại hình, chỉ cần match tên
-        return queryParsed.name === targetParsed.name;
     }, [parseAdministrativeText]);
 
-    // Ultra-strict search function
+    const isExactAccentMatch = useCallback((queryText: string, targetText: string): boolean => {
+        const queryLower = queryText.toLowerCase().trim();
+        const targetLower = targetText.toLowerCase().trim();
+
+        const queryParsed = parseAdministrativeText(queryText);
+        const targetParsed = parseAdministrativeText(targetText);
+
+        if (queryParsed.type) {
+            return queryParsed.originalText === targetParsed.originalText;
+        } else {
+            return queryLower === targetLower;
+        }
+    }, [parseAdministrativeText]);
+
+    const calculatePriorityTier = useCallback((query: string, target: string): number => {
+        const queryLower = query.toLowerCase().trim();
+        const targetLower = target.toLowerCase().trim();
+
+        // Tier 1: Perfect exact match (100)
+        if (queryLower === targetLower) {
+            return 100;
+        }
+
+        // Tier 2: Contains exact query with accents (90)
+        if (targetLower.includes(queryLower)) {
+            return 90;
+        }
+
+        // Tier 3: Normalized match (70)
+        if (normalizeForSearch(queryLower) === normalizeForSearch(targetLower)) {
+            return 70;
+        }
+
+        // Tier 4: Normalized contains (50)
+        if (normalizeForSearch(targetLower).includes(normalizeForSearch(queryLower))) {
+            return 50;
+        }
+
+        return 0;
+    }, []);
+
     const search = useCallback((query: string): FlatSearchItem[] => {
         if (!query.trim()) {
             return [];
@@ -128,88 +203,119 @@ export function useSearchData() {
             return [];
         }
 
-        const results: Array<{ item: FlatSearchItem; score: number }> = [];
+        const results: Array<{
+            item: FlatSearchItem;
+            score: number;
+            accentScore: number;
+            priorityTier: number;
+            matchedTarget: string
+        }> = [];
 
-        // Search through all items
         for (let i = 0; i < data.length; i++) {
             const item = data[i];
 
-            // Nếu có target level cụ thể, chỉ tìm trong cấp đó
             if (targetLevel !== 'all' && item.level !== targetLevel) {
                 continue;
             }
 
             let score = 0;
+            let accentScore = 0;
+            let priorityTier = 0;
+            let matchedTarget = '';
 
-            // 1. Kiểm tra exact match với administrative type awareness
             if (item.level === 'commune') {
-                // Kiểm tra trong newUnit ward
-                if (item.newUnit?.ward && isExactAdministrativeMatch(originalQuery, item.newUnit.ward)) {
+                if (item.newUnit?.ward && isExactAdministrativeMatch(query, item.newUnit.ward)) {
                     score = 100;
+                    matchedTarget = item.newUnit.ward;
+                    priorityTier = calculatePriorityTier(query, item.newUnit.ward);
+                    accentScore = isExactAccentMatch(query, item.newUnit.ward) ? 100 : 70;
                 }
 
-                // Kiểm tra trong oldUnits ward
                 if (score === 0 && item.oldUnits) {
                     for (const oldUnit of item.oldUnits) {
-                        if (oldUnit.ward && isExactAdministrativeMatch(originalQuery, oldUnit.ward)) {
+                        if (oldUnit.ward && isExactAdministrativeMatch(query, oldUnit.ward)) {
                             score = 95;
+                            matchedTarget = oldUnit.ward;
+                            priorityTier = calculatePriorityTier(query, oldUnit.ward);
+                            accentScore = isExactAccentMatch(query, oldUnit.ward) ? 100 : 70;
                             break;
                         }
                     }
                 }
             }
             else if (item.level === 'district') {
-                if (item.oldDistrict && isExactAdministrativeMatch(originalQuery, item.oldDistrict)) {
+                if (item.oldDistrict && isExactAdministrativeMatch(query, item.oldDistrict)) {
                     score = 90;
+                    matchedTarget = item.oldDistrict;
+                    priorityTier = calculatePriorityTier(query, item.oldDistrict);
+                    accentScore = isExactAccentMatch(query, item.oldDistrict) ? 100 : 70;
                 }
-                else if (item.newDistrict && isExactAdministrativeMatch(originalQuery, item.newDistrict)) {
+                else if (item.newDistrict && isExactAdministrativeMatch(query, item.newDistrict)) {
                     score = 85;
+                    matchedTarget = item.newDistrict;
+                    priorityTier = calculatePriorityTier(query, item.newDistrict);
+                    accentScore = isExactAccentMatch(query, item.newDistrict) ? 100 : 70;
                 }
             }
             else if (item.level === 'province') {
-                if (item.oldProvince && isExactAdministrativeMatch(originalQuery, item.oldProvince)) {
+                if (item.oldProvince && isExactAdministrativeMatch(query, item.oldProvince)) {
                     score = 80;
+                    matchedTarget = item.oldProvince;
+                    priorityTier = calculatePriorityTier(query, item.oldProvince);
+                    accentScore = isExactAccentMatch(query, item.oldProvince) ? 100 : 70;
                 }
-                else if (item.newProvince && isExactAdministrativeMatch(originalQuery, item.newProvince)) {
+                else if (item.newProvince && isExactAdministrativeMatch(query, item.newProvince)) {
                     score = 75;
+                    matchedTarget = item.newProvince;
+                    priorityTier = calculatePriorityTier(query, item.newProvince);
+                    accentScore = isExactAccentMatch(query, item.newProvince) ? 100 : 70;
                 }
             }
 
-            // 2. Fallback: Exact match trong searchText (cho các trường hợp đặc biệt)
             if (score === 0) {
-                // Tạo regex chính xác với word boundary
                 const escapedQuery = originalQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const regex = new RegExp(`\\b${escapedQuery}\\b`, 'i');
 
                 if (regex.test(item.normalizedSearchText)) {
                     score = 70;
+                    accentScore = calculateAccentScore(query, item.originalSearchText);
+                    priorityTier = 40;
                 }
             }
 
-            // 3. Đặc biệt: Tìm kiếm số (như "3", "1", "2")
             if (score === 0 && cleanQuery.match(/^\d+$/)) {
                 const wordBoundaryRegex = new RegExp(`\\b${cleanQuery}\\b`);
                 if (wordBoundaryRegex.test(item.normalizedSearchText)) {
                     score = 60;
+                    accentScore = 50;
+                    priorityTier = 30;
                 }
             }
 
-            // CHỈ THÊM VÀO RESULTS NẾU CÓ ĐIỂM SỐ
             if (score > 0) {
-                results.push({ item, score });
+                results.push({ item, score, accentScore, priorityTier, matchedTarget });
             }
         }
 
-        // Sort by score
+        // Sort by priority tier first, then score, then accent score, then name
         const sortedResults = results.sort((a, b) => {
+            if (b.priorityTier !== a.priorityTier) {
+                return b.priorityTier - a.priorityTier;
+            }
+
             if (b.score !== a.score) {
                 return b.score - a.score;
             }
+
+            if (b.accentScore !== a.accentScore) {
+                return b.accentScore - a.accentScore;
+            }
+
             return a.item.name.localeCompare(b.item.name, 'vi');
         });
 
         return sortedResults.slice(0, 30).map(result => result.item);
-    }, [data, detectAdministrativeLevel, isExactAdministrativeMatch]);
+    }, [data, detectAdministrativeLevel, isExactAdministrativeMatch, isExactAccentMatch, calculatePriorityTier, calculateAccentScore]);
 
     return {
         search,
