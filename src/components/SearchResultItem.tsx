@@ -175,7 +175,8 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                     <div className="flex-1">
                         <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Trước sắp xếp</div>
                         <div className="space-y-2">
-                            {oldUnits.slice(0, 2).map((unit: AdministrativeUnit, index: number) => (
+                            {/* Chỉ hiển thị 1 đơn vị đầu tiên */}
+                            {oldUnits.slice(0, 1).map((unit: AdministrativeUnit, index: number) => (
                                 <div key={index} className="text-sm">
                                     <div className="font-medium text-gray-900 dark:text-white">
                                         {highlightText(unit.province, searchQuery)}
@@ -187,9 +188,10 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                     </div>
                                 </div>
                             ))}
-                            {oldUnits.length > 2 && (
+                            {/* Hiển thị "+x đơn vị khác" nếu có hơn 1 đơn vị */}
+                            {oldUnits.length > 1 && (
                                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                                    +{oldUnits.length - 2} đơn vị khác
+                                    +{oldUnits.length - 1} đơn vị khác
                                 </div>
                             )}
                         </div>
@@ -206,8 +208,13 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                 {highlightText(newUnit.province, searchQuery)}
                             </div>
                             <div className="text-gray-600 dark:text-gray-300">
-                                {newUnit.district && newUnit.district !== "∅" && highlightText(newUnit.district, searchQuery)}
-                                {newUnit.district && newUnit.district !== "∅" && " • "}
+                                {/* Bỏ ký hiệu "— •" khi district là "—" hoặc rỗng */}
+                                {newUnit.district && newUnit.district !== "∅" && newUnit.district !== "—" && (
+                                    <>
+                                        {highlightText(newUnit.district, searchQuery)}
+                                        {" • "}
+                                    </>
+                                )}
                                 {highlightText(newUnit.ward, searchQuery)}
                             </div>
                         </div>
