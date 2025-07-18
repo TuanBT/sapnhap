@@ -30,7 +30,7 @@ const Search: React.FC = () => {
                     <div className="text-red-500 text-4xl mb-4">⚠️</div>
                     <p className="text-red-600">Lỗi: {error}</p>
                     <p className="text-sm text-gray-500 mt-2">
-                        Vui lòng đảm bảo file thongtinhanhchinh.txt có trong thư mục public
+                        Vui lòng đảm bảo file thongtinhanhchinh.json có trong thư mục public
                     </p>
                 </div>
             </div>
