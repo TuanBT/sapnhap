@@ -12,36 +12,37 @@ export function normalizeForSearch(text: string): string {
         .trim();
 }
 
-// Tạo search keywords từ text
+// Tạo search keywords từ text (ưu tiên cụm từ liên tiếp)
 export function createSearchKeywords(text: string): string[] {
     const normalized = normalizeForSearch(text);
     const words = normalized.split(' ').filter(word => word.length > 0);
 
-    // Tạo combination của các từ
     const keywords = new Set<string>();
 
-    // Thêm từng từ riêng lẻ
+    // Thêm toàn bộ text (ưu tiên cao nhất)
+    keywords.add(normalized);
+
+    // Thêm cụm từ liên tiếp (2-5 từ) - ưu tiên cao
+    for (let len = 2; len <= Math.min(5, words.length); len++) {
+        for (let i = 0; i <= words.length - len; i++) {
+            const phrase = words.slice(i, i + len).join(' ');
+            if (phrase.length >= 5) { // Chỉ lấy cụm từ có ít nhất 5 ký tự
+                keywords.add(phrase);
+            }
+        }
+    }
+
+    // Thêm từng từ riêng lẻ (ưu tiên thấp, chỉ từ có ý nghĩa)
     words.forEach(word => {
-        if (word.length >= 2) { // Chỉ lấy từ có ít nhất 2 ký tự
+        if (word.length >= 3) { // Chỉ lấy từ có ít nhất 3 ký tự
             keywords.add(word);
         }
     });
 
-    // Thêm cụm từ (2-3 từ liên tiếp)
-    for (let i = 0; i < words.length - 1; i++) {
-        keywords.add(words[i] + ' ' + words[i + 1]);
-        if (i < words.length - 2) {
-            keywords.add(words[i] + ' ' + words[i + 1] + ' ' + words[i + 2]);
-        }
-    }
-
-    // Thêm toàn bộ text
-    keywords.add(normalized);
-
     return Array.from(keywords);
 }
 
-// Tính độ tương đồng giữa query và text
+// Tính độ tương đồng giữa query và text (chỉ cho exact phrase)
 export function calculateSimilarity(query: string, text: string): number {
     const normalizedQuery = normalizeForSearch(query);
     const normalizedText = normalizeForSearch(text);
@@ -49,40 +50,15 @@ export function calculateSimilarity(query: string, text: string): number {
     // Exact match
     if (normalizedText === normalizedQuery) return 100;
 
-    // Starts with
-    if (normalizedText.startsWith(normalizedQuery)) return 90;
+    // Contains exact phrase
+    if (normalizedText.includes(normalizedQuery)) return 90;
 
-    // Contains
-    if (normalizedText.includes(normalizedQuery)) return 80;
+    // Starts with exact phrase
+    if (normalizedText.startsWith(normalizedQuery)) return 85;
 
-    // Word match
-    const queryWords = normalizedQuery.split(' ');
-    const textWords = normalizedText.split(' ');
+    // Ends with exact phrase
+    if (normalizedText.endsWith(normalizedQuery)) return 80;
 
-    let matchedWords = 0;
-    queryWords.forEach(qWord => {
-        if (textWords.some(tWord => tWord.includes(qWord) || qWord.includes(tWord))) {
-            matchedWords++;
-        }
-    });
-
-    if (matchedWords > 0) {
-        return 70 * (matchedWords / queryWords.length);
-    }
-
-    // Partial character match
-    let matchedChars = 0;
-    for (let i = 0; i < Math.min(normalizedQuery.length, normalizedText.length); i++) {
-        if (normalizedQuery[i] === normalizedText[i]) {
-            matchedChars++;
-        } else {
-            break;
-        }
-    }
-
-    if (matchedChars >= 2) {
-        return 50 * (matchedChars / normalizedQuery.length);
-    }
-
+    // Không tìm kiếm từ riêng lẻ nữa - chỉ tìm exact phrase
     return 0;
 }

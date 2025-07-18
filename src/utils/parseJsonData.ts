@@ -1,4 +1,4 @@
-import type { SearchItem, CommuneSearchItem, AdministrativeUnit } from '../types/administrative';
+import type { SearchItem, CommuneSearchItem, ProvinceSearchItem, DistrictSearchItem, AdministrativeUnit } from '../types/administrative';
 
 // JSON structure from thongtinhanhchinh.json
 interface JsonChange {
@@ -22,14 +22,19 @@ interface JsonData {
 export function parseJsonData(jsonData: JsonData): SearchItem[] {
     console.log(`Loading ${jsonData.metadata.totalChanges} changes from JSON`);
 
-    const searchItems: SearchItem[] = jsonData.changes.map((change): SearchItem => {
-        const normalizeText = (text: string) => {
-            if (!text) return '';
-            return text.trim()
-                .replace(/\s+/g, ' ')
-                .normalize('NFC');
-        };
+    const normalizeText = (text: string) => {
+        if (!text) return '';
+        return text.trim()
+            .replace(/\s+/g, ' ')
+            .normalize('NFC');
+    };
 
+    const searchItems: SearchItem[] = [];
+    const provinceChanges = new Map<string, string>();
+    const districtChanges = new Map<string, { oldProvince: string; newProvince: string; oldDistrict: string; newDistrict: string }>();
+
+    // First pass: Create commune items and collect unique province/district changes
+    jsonData.changes.forEach((change) => {
         const newUnit: AdministrativeUnit = {
             province: normalizeText(change.newUnit.province),
             district: change.newUnit.district,
@@ -42,13 +47,39 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
             ward: normalizeText(unit.ward) || "∅"
         }));
 
+        // Track province changes (chỉ lưu unique changes)
+        oldUnits.forEach(oldUnit => {
+            if (oldUnit.province !== "∅" && oldUnit.province !== newUnit.province) {
+                if (!provinceChanges.has(oldUnit.province)) {
+                    provinceChanges.set(oldUnit.province, newUnit.province);
+                }
+            }
+        });
+
+        // Track district changes (chỉ lưu unique changes)
+        oldUnits.forEach(oldUnit => {
+            if (oldUnit.district !== "∅" && oldUnit.province !== "∅") {
+                const oldKey = `${oldUnit.province}|${oldUnit.district}`;
+                const newKey = `${newUnit.province}|${newUnit.district}`;
+
+                if (oldKey !== newKey && !districtChanges.has(oldKey)) {
+                    districtChanges.set(oldKey, {
+                        oldProvince: oldUnit.province,
+                        newProvince: newUnit.province,
+                        oldDistrict: oldUnit.district,
+                        newDistrict: newUnit.district || "—"
+                    });
+                }
+            }
+        });
+
+        // Create commune item
         const baseSearchText = [
             newUnit.province,
             newUnit.ward,
             ...oldUnits.map(unit => `${unit.province} ${unit.district} ${unit.ward}`)
         ].join(' ');
 
-        // Always return CommuneSearchItem for now since current data is commune-level
         const communeItem: CommuneSearchItem = {
             id: change.id,
             name: newUnit.ward,
@@ -60,10 +91,46 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
             searchText: baseSearchText
         };
 
-        return communeItem;
+        searchItems.push(communeItem);
     });
 
-    console.log(`Generated ${searchItems.length} search items`);
+    // Second pass: Create unique province items
+    let provinceId = 1;
+    provinceChanges.forEach((newProvince, oldProvince) => {
+        const provinceItem: ProvinceSearchItem = {
+            id: `province-${provinceId++}`,
+            name: newProvince,
+            level: 'province',
+            oldProvince,
+            newProvince,
+            fullPath: `${oldProvince} → ${newProvince}`,
+            searchText: `${oldProvince} ${newProvince}`
+        };
+        searchItems.push(provinceItem);
+    });
+
+    // Third pass: Create unique district items
+    let districtId = 1;
+    districtChanges.forEach((change) => {
+        const districtItem: DistrictSearchItem = {
+            id: `district-${districtId++}`,
+            name: change.newDistrict,
+            level: 'district',
+            oldProvince: change.oldProvince,
+            newProvince: change.newProvince,
+            oldDistrict: change.oldDistrict,
+            newDistrict: change.newDistrict,
+            fullPath: `${change.oldProvince} > ${change.oldDistrict} → ${change.newProvince} > ${change.newDistrict}`,
+            searchText: `${change.oldProvince} ${change.oldDistrict} ${change.newProvince} ${change.newDistrict}`
+        };
+        searchItems.push(districtItem);
+    });
+
+    console.log(`Generated ${searchItems.length} search items:`);
+    console.log(`- Provinces: ${provinceChanges.size}`);
+    console.log(`- Districts: ${districtChanges.size}`);
+    console.log(`- Communes: ${jsonData.changes.length}`);
+
     return searchItems;
 }
 
