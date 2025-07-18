@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { loadSearchData } from '../utils/parseJsonData';
 import { normalizeForSearch } from '../utils/searchUtils';
@@ -76,17 +75,47 @@ export function useSearchData() {
         return { level: 'all', cleanQuery: normalizedQuery };
     }, []);
 
-    // Hàm kiểm tra exact phrase match
-    const isExactPhraseMatch = useCallback((query: string, text: string): boolean => {
-        const normalizedQuery = normalizeForSearch(query);
-        const normalizedText = normalizeForSearch(text);
+    // Hàm tách loại hình đơn vị và tên
+    const parseAdministrativeText = useCallback((text: string): { type: string; name: string } => {
+        const normalized = normalizeForSearch(text);
 
-        // Tạo regex với word boundaries để match chính xác cụm từ
-        const regex = new RegExp(`\\b${normalizedQuery.replace(/\s+/g, '\\s+')}\\b`, 'i');
-        return regex.test(normalizedText);
+        // Các pattern để tách loại hình
+        const patterns = [
+            { regex: /^(xa)\s+(.+)$/, type: 'xa' },
+            { regex: /^(phuong)\s+(.+)$/, type: 'phuong' },
+            { regex: /^(thi tran)\s+(.+)$/, type: 'thi tran' },
+            { regex: /^(quan)\s+(.+)$/, type: 'quan' },
+            { regex: /^(huyen)\s+(.+)$/, type: 'huyen' },
+            { regex: /^(thi xa)\s+(.+)$/, type: 'thi xa' },
+            { regex: /^(thanh pho)\s+(.+)$/, type: 'thanh pho' },
+            { regex: /^(tinh)\s+(.+)$/, type: 'tinh' }
+        ];
+
+        for (const pattern of patterns) {
+            const match = normalized.match(pattern.regex);
+            if (match) {
+                return { type: match[1], name: match[2] };
+            }
+        }
+
+        return { type: '', name: normalized };
     }, []);
 
-    // Improved search function with exact phrase matching
+    // Hàm kiểm tra exact match có phân biệt loại hình
+    const isExactAdministrativeMatch = useCallback((queryText: string, targetText: string): boolean => {
+        const queryParsed = parseAdministrativeText(queryText);
+        const targetParsed = parseAdministrativeText(targetText);
+
+        // Nếu query có loại hình cụ thể, phải match chính xác cả loại hình và tên
+        if (queryParsed.type) {
+            return queryParsed.type === targetParsed.type && queryParsed.name === targetParsed.name;
+        }
+
+        // Nếu query không có loại hình, chỉ cần match tên
+        return queryParsed.name === targetParsed.name;
+    }, [parseAdministrativeText]);
+
+    // Ultra-strict search function
     const search = useCallback((query: string): FlatSearchItem[] => {
         if (!query.trim()) {
             return [];
@@ -112,37 +141,52 @@ export function useSearchData() {
 
             let score = 0;
 
-            // 1. EXACT MATCH toàn bộ query (highest priority)
-            if (isExactPhraseMatch(originalQuery, item.normalizedSearchText)) {
-                score = 100;
-            }
-            // 2. EXACT MATCH với clean query (khi có prefix)
-            else if (originalQuery !== cleanQuery && isExactPhraseMatch(cleanQuery, item.normalizedSearchText)) {
-                score = 95;
-            }
-            // 3. Đối với commune level, kiểm tra exact match trong từng field
-            else if (item.level === 'commune') {
+            // 1. Kiểm tra exact match với administrative type awareness
+            if (item.level === 'commune') {
                 // Kiểm tra trong newUnit ward
-                if (item.newUnit?.ward && isExactPhraseMatch(originalQuery, item.newUnit.ward)) {
-                    score = 90;
+                if (item.newUnit?.ward && isExactAdministrativeMatch(originalQuery, item.newUnit.ward)) {
+                    score = 100;
                 }
 
                 // Kiểm tra trong oldUnits ward
                 if (score === 0 && item.oldUnits) {
                     for (const oldUnit of item.oldUnits) {
-                        if (oldUnit.ward && isExactPhraseMatch(originalQuery, oldUnit.ward)) {
-                            score = 85;
+                        if (oldUnit.ward && isExactAdministrativeMatch(originalQuery, oldUnit.ward)) {
+                            score = 95;
                             break;
                         }
                     }
                 }
             }
-            // 4. Fallback: contains (lowest priority)
-            else if (item.normalizedSearchText.includes(cleanQuery)) {
-                score = 50; // Giảm điểm thấp hơn để ưu tiên exact match
+            else if (item.level === 'district') {
+                if (item.oldDistrict && isExactAdministrativeMatch(originalQuery, item.oldDistrict)) {
+                    score = 90;
+                }
+                else if (item.newDistrict && isExactAdministrativeMatch(originalQuery, item.newDistrict)) {
+                    score = 85;
+                }
+            }
+            else if (item.level === 'province') {
+                if (item.oldProvince && isExactAdministrativeMatch(originalQuery, item.oldProvince)) {
+                    score = 80;
+                }
+                else if (item.newProvince && isExactAdministrativeMatch(originalQuery, item.newProvince)) {
+                    score = 75;
+                }
             }
 
-            // Đặc biệt: Tìm kiếm số (như "3", "1", "2") cần match word boundary
+            // 2. Fallback: Exact match trong searchText (cho các trường hợp đặc biệt)
+            if (score === 0) {
+                // Tạo regex chính xác với word boundary
+                const escapedQuery = originalQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`\\b${escapedQuery}\\b`, 'i');
+
+                if (regex.test(item.normalizedSearchText)) {
+                    score = 70;
+                }
+            }
+
+            // 3. Đặc biệt: Tìm kiếm số (như "3", "1", "2")
             if (score === 0 && cleanQuery.match(/^\d+$/)) {
                 const wordBoundaryRegex = new RegExp(`\\b${cleanQuery}\\b`);
                 if (wordBoundaryRegex.test(item.normalizedSearchText)) {
@@ -150,31 +194,22 @@ export function useSearchData() {
                 }
             }
 
+            // CHỈ THÊM VÀO RESULTS NẾU CÓ ĐIỂM SỐ
             if (score > 0) {
                 results.push({ item, score });
             }
         }
 
-        // Sort by score với ưu tiên cao hơn cho exact matches
+        // Sort by score
         const sortedResults = results.sort((a, b) => {
-            // Ưu tiên điểm số cao (exact match)
             if (b.score !== a.score) {
                 return b.score - a.score;
             }
-
-            // Ưu tiên district và commune hơn province cho query chứa "thanh pho"
-            if (cleanQuery.includes('thanh pho')) {
-                if (a.item.level === 'district' && b.item.level !== 'district') return -1;
-                if (b.item.level === 'district' && a.item.level !== 'district') return 1;
-                if (a.item.level === 'commune' && b.item.level === 'province') return -1;
-                if (b.item.level === 'commune' && a.item.level === 'province') return 1;
-            }
-
             return a.item.name.localeCompare(b.item.name, 'vi');
         });
 
-        return sortedResults.slice(0, 100).map(result => result.item);
-    }, [data, detectAdministrativeLevel, isExactPhraseMatch]);
+        return sortedResults.slice(0, 30).map(result => result.item);
+    }, [data, detectAdministrativeLevel, isExactAdministrativeMatch]);
 
     return {
         search,
