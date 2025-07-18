@@ -46,13 +46,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
         return (
             <div className="text-center py-16">
                 <FontAwesomeIcon icon={faSearch} className="text-gray-400 text-4xl mb-4" />
-                <h3 className="text-lg font-medium text-gray-700 mb-2">
+                <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Nhập từ khóa để tìm kiếm
                 </h3>
-                <p className="text-gray-500 mb-4">
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
                     Tìm kiếm theo tên tỉnh, huyện, phường/xã cũ hoặc mới
                 </p>
-                <div className="max-w-md mx-auto text-sm text-gray-400">
+                <div className="max-w-md mx-auto text-sm text-gray-400 dark:text-gray-500">
                     <p className="mb-2">💡 <strong>Mẹo tìm kiếm:</strong></p>
                     <div className="text-left space-y-1">
                         <p>"<strong>An Khánh</strong>" - tìm tất cả đơn vị có tên này</p>
@@ -70,13 +70,13 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
         return (
             <div className="text-center py-16">
                 <FontAwesomeIcon icon={faSearch} className="text-gray-400 text-4xl mb-4" />
-                <h3 className="text-lg font-medium text-gray-700 mb-2">
+                <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Không tìm thấy kết quả cho "{searchQuery}"
                 </h3>
-                <p className="text-gray-500 mb-4">
+                <p className="text-gray-500 dark:text-gray-400 mb-4">
                     Thử với từ khóa khác hoặc kiểm tra lại chính tả
                 </p>
-                <div className="max-w-md mx-auto text-sm text-gray-400">
+                <div className="max-w-md mx-auto text-sm text-gray-400 dark:text-gray-500">
                     <p className="mb-2">💡 <strong>Gợi ý:</strong></p>
                     <div className="text-left space-y-1">
                         <p>• Thử tìm kiếm với từ khóa ngắn hơn: "<strong>Tuy Hòa</strong>"</p>
@@ -92,17 +92,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
     return (
         <div className="space-y-4">
             {/* Search info */}
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-700">
                 <div className="flex items-start space-x-3">
-                    <FontAwesomeIcon icon={faInfoCircle} className="text-blue-600 mt-0.5" />
+                    <FontAwesomeIcon icon={faInfoCircle} className="text-blue-600 dark:text-blue-400 mt-0.5" />
                     <div>
-                        <div className="text-sm text-blue-800">
+                        <div className="text-sm text-blue-800 dark:text-blue-200">
                             <strong>Kết quả tìm kiếm cho:</strong> "<span className="font-mono">{searchQuery}</span>"
                         </div>
-                        <div className="text-sm text-blue-700 mt-1">
+                        <div className="text-sm text-blue-700 dark:text-blue-300 mt-1">
                             Tìm thấy {filteredResults.length} kết quả
                             {detectedLevel !== 'all' && (
-                                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs">
+                                <span className="ml-2 px-2 py-1 bg-blue-100 dark:bg-blue-800 text-blue-700 dark:text-blue-200 rounded text-xs">
                                     {detectedLevel === 'province' && 'Lọc theo cấp tỉnh/thành phố'}
                                     {detectedLevel === 'district' && 'Lọc theo cấp quận/huyện'}
                                     {detectedLevel === 'commune' && 'Lọc theo cấp xã/phường'}
@@ -110,7 +110,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({ results, searchQuery }) =
                             )}
                         </div>
                         {hasMoreResults && (
-                            <div className="text-xs text-blue-600 mt-1">
+                            <div className="text-xs text-blue-600 dark:text-blue-400 mt-1">
                                 Có {results.length - filteredResults.length} kết quả khác. Scroll xuống để xem thêm.
                             </div>
                         )}

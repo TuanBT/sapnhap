@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { useSearchData } from '../hooks/useSearchData';
 import SearchHeader from '../components/SearchHeader';
 import SearchResults from '../components/SearchResults';
-// Xóa import Header vì đã có trong Home.tsx
 
 const Search: React.FC = () => {
     const { search, loading, error, totalItems } = useSearchData();
@@ -34,10 +33,10 @@ const Search: React.FC = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                    <p className="text-gray-600">Đang tải dữ liệu...</p>
+                    <p className="text-gray-600 dark:text-gray-300">Đang tải dữ liệu...</p>
                 </div>
             </div>
         );
@@ -45,11 +44,11 @@ const Search: React.FC = () => {
 
     if (error) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-red-500 text-4xl mb-4">⚠️</div>
-                    <p className="text-red-600">Lỗi: {error}</p>
-                    <p className="text-sm text-gray-500 mt-2">
+                    <p className="text-red-600 dark:text-red-400">Lỗi: {error}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                         Vui lòng đảm bảo file thongtinhanhchinh.json có trong thư mục public
                     </p>
                 </div>
