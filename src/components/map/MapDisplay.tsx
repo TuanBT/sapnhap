@@ -22,7 +22,6 @@ export interface MapDisplayRef {
 
 const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                                                                    title,
-                                                                   subtitle,
                                                                    count,
                                                                    backgroundColor,
                                                                    onProvinceHover,
@@ -87,8 +86,14 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         const container = containerRef.current;
         if (!container) return;
 
-        const preventScroll = (e: WheelEvent) => {
+        // Wheel event handler with proper passive: false
+        const handleWheelEvent = (e: WheelEvent) => {
             e.preventDefault();
+            if (e.deltaY < 0) {
+                setScale(prevScale => Math.min(prevScale * 1.3, 4));
+            } else {
+                setScale(prevScale => Math.max(prevScale / 1.3, 0.6));
+            }
         };
 
         const preventTouchMove = (e: TouchEvent) => {
@@ -97,11 +102,11 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
             }
         };
 
-        container.addEventListener('wheel', preventScroll, { passive: false });
+        container.addEventListener('wheel', handleWheelEvent, { passive: false });
         container.addEventListener('touchmove', preventTouchMove, { passive: false });
 
         return () => {
-            container.removeEventListener('wheel', preventScroll);
+            container.removeEventListener('wheel', handleWheelEvent);
             container.removeEventListener('touchmove', preventTouchMove);
         };
     }, []);
@@ -317,7 +322,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         });
     };
 
-    // Touch distance calculation - Fixed TypeScript issue
+    // Touch distance calculation
     const getTouchDistance = (touches: React.TouchList) => {
         if (touches.length < 2) return 0;
         const touch1 = touches[0];
@@ -328,7 +333,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         );
     };
 
-    // Touch center calculation - Fixed TypeScript issue
+    // Touch center calculation
     const getTouchCenter = (touches: React.TouchList) => {
         if (touches.length < 2) return { x: 0, y: 0 };
         const touch1 = touches[0];
@@ -436,15 +441,6 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         }
     };
 
-    const handleWheel = (e: React.WheelEvent) => {
-        e.preventDefault();
-        if (e.deltaY < 0) {
-            handleZoomIn();
-        } else {
-            handleZoomOut();
-        }
-    };
-
     return (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-colors duration-200 h-full flex flex-col">
             <div className={`${backgroundColor} text-white p-2 md:p-4 flex-shrink-0`}>
@@ -499,7 +495,6 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
-                    onWheel={handleWheel}
                     onTouchStart={handleTouchStart}
                     onTouchMove={handleTouchMove}
                     onTouchEnd={handleTouchEnd}
