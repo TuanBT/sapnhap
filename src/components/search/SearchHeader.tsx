@@ -62,7 +62,7 @@ const SearchHeader: React.FC<SearchHeaderProps> = ({ onSearch, totalItems, isSea
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Nhập tên tỉnh, huyện, xã..."
+                                placeholder="Nhập tên đơn vị hành chính bất kỳ..."
                                 className="
                                     w-full pl-12 pr-24 py-4 md:py-5
                                     border border-gray-300 dark:border-gray-600

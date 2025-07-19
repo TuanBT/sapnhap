@@ -40,6 +40,9 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
     const [isDragging, setIsDragging] = useState(false);
     const [dragStart, setDragStart] = useState({ x: 0, y: 0, translateX: 0, translateY: 0 });
 
+    // Touch handling for pinch zoom
+    const [touchStart, setTouchStart] = useState<{ dist: number; scale: number; x: number; y: number } | null>(null);
+
     // State cho tooltip
     const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
     const [isTooltipVisible, setIsTooltipVisible] = useState(false);
@@ -88,10 +91,18 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
             e.preventDefault();
         };
 
+        const preventTouchMove = (e: TouchEvent) => {
+            if (e.touches.length > 1) {
+                e.preventDefault();
+            }
+        };
+
         container.addEventListener('wheel', preventScroll, { passive: false });
+        container.addEventListener('touchmove', preventTouchMove, { passive: false });
 
         return () => {
             container.removeEventListener('wheel', preventScroll);
+            container.removeEventListener('touchmove', preventTouchMove);
         };
     }, []);
 
@@ -103,7 +114,6 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
             }
         };
 
-        // Add both mouse and touch events
         document.addEventListener('click', handleClickOutside);
         document.addEventListener('touchstart', handleClickOutside);
 
@@ -115,11 +125,9 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
 
     const resetSelection = () => {
         if (selectedElement) {
-            // Force reset all styles - remove both class and inline styles
             selectedElement.classList.remove('province-selected');
             selectedElement.removeAttribute('style');
 
-            // Force reapply default styles
             const isDarkMode = document.documentElement.classList.contains('dark');
             const defaultFill = isDarkMode ? '#4b5563' : '#e5e7eb';
             const defaultStroke = isDarkMode ? '#6b7280' : '#9ca3af';
@@ -149,7 +157,6 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         element.classList.remove('province-selected');
         element.removeAttribute('style');
 
-        // Force reapply default styles
         const isDarkMode = document.documentElement.classList.contains('dark');
         const defaultFill = isDarkMode ? '#4b5563' : '#e5e7eb';
         const defaultStroke = isDarkMode ? '#6b7280' : '#9ca3af';
@@ -212,7 +219,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
 
         elements.forEach((element) => {
             if (mobile) {
-                // Mobile: Click behavior
+                // Mobile: Chỉ có click behavior
                 element.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -226,23 +233,17 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
 
                     // Toggle current selection
                     if (selectedElement === element) {
-                        // Deselect
                         resetSelection();
                     } else {
-                        // Select new
                         setSelectedElement(element as SVGElement);
                         highlightElement(element as SVGElement);
 
                         // Get click position for tooltip
                         const rect = containerRef.current?.getBoundingClientRect();
                         if (rect) {
-                            const touchEvent = e as any;
-                            const clientX = touchEvent.touches?.[0]?.clientX || touchEvent.clientX || rect.left + rect.width / 2;
-                            const clientY = touchEvent.touches?.[0]?.clientY || touchEvent.clientY || rect.top + rect.height / 2;
-
                             setTooltipPosition({
-                                x: clientX - rect.left,
-                                y: clientY - rect.top - 10
+                                x: rect.width / 2,
+                                y: rect.height / 2
                             });
                         }
 
@@ -251,7 +252,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                     }
                 });
             } else {
-                // Desktop: Hover behavior + click to select
+                // Desktop: Hover + click behavior
                 element.addEventListener('mouseenter', () => {
                     if (!isDragging && !selectedElement) {
                         onProvinceHover(element as SVGElement, mapType);
@@ -279,7 +280,6 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                     }
                 });
 
-                // Desktop: Click to select/deselect
                 element.addEventListener('click', (e) => {
                     if (isDragging) {
                         e.preventDefault();
@@ -290,21 +290,16 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                     e.preventDefault();
                     e.stopPropagation();
 
-                    // Reset previous selection
                     if (selectedElement && selectedElement !== element) {
                         resetElementStyle(selectedElement);
                     }
 
-                    // Toggle current selection
                     if (selectedElement === element) {
-                        // Deselect
                         resetSelection();
                     } else {
-                        // Select new
                         setSelectedElement(element as SVGElement);
                         highlightElement(element as SVGElement);
 
-                        // Get click position for tooltip
                         const rect = containerRef.current?.getBoundingClientRect();
                         if (rect) {
                             const mouseEvent = e as MouseEvent;
@@ -322,6 +317,28 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         });
     };
 
+    // Touch distance calculation - Fixed TypeScript issue
+    const getTouchDistance = (touches: React.TouchList) => {
+        if (touches.length < 2) return 0;
+        const touch1 = touches[0];
+        const touch2 = touches[1];
+        return Math.sqrt(
+            Math.pow(touch2.clientX - touch1.clientX, 2) +
+            Math.pow(touch2.clientY - touch1.clientY, 2)
+        );
+    };
+
+    // Touch center calculation - Fixed TypeScript issue
+    const getTouchCenter = (touches: React.TouchList) => {
+        if (touches.length < 2) return { x: 0, y: 0 };
+        const touch1 = touches[0];
+        const touch2 = touches[1];
+        return {
+            x: (touch1.clientX + touch2.clientX) / 2,
+            y: (touch1.clientY + touch2.clientY) / 2
+        };
+    };
+
     const handleZoomIn = () => {
         setScale(prevScale => Math.min(prevScale * 1.3, 4));
     };
@@ -336,6 +353,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         setTranslateY(0);
     };
 
+    // Mouse events
     const handleMouseDown = (e: React.MouseEvent) => {
         if (scale > 1) {
             e.preventDefault();
@@ -367,7 +385,59 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
         }
     };
 
+    // Touch events - Google Maps style
+    const handleTouchStart = (e: React.TouchEvent) => {
+        if (e.touches.length === 2) {
+            e.preventDefault();
+            const distance = getTouchDistance(e.touches);
+            const center = getTouchCenter(e.touches);
+            setTouchStart({
+                dist: distance,
+                scale: scale,
+                x: center.x,
+                y: center.y
+            });
+        } else if (e.touches.length === 1 && scale > 1) {
+            e.preventDefault();
+            setIsDragging(true);
+            setDragStart({
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY,
+                translateX: translateX,
+                translateY: translateY
+            });
+        }
+    };
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (e.touches.length === 2 && touchStart) {
+            e.preventDefault();
+            const distance = getTouchDistance(e.touches);
+            const scaleChange = distance / touchStart.dist;
+            const newScale = Math.min(Math.max(touchStart.scale * scaleChange, 0.6), 4);
+            setScale(newScale);
+        } else if (e.touches.length === 1 && isDragging && scale > 1) {
+            e.preventDefault();
+            const deltaX = e.touches[0].clientX - dragStart.x;
+            const deltaY = e.touches[0].clientY - dragStart.y;
+            setTranslateX(dragStart.translateX + deltaX);
+            setTranslateY(dragStart.translateY + deltaY);
+        }
+    };
+
+    const handleTouchEnd = (e: React.TouchEvent) => {
+        if (e.touches.length < 2) {
+            setTouchStart(null);
+        }
+        if (e.touches.length === 0) {
+            setTimeout(() => {
+                setIsDragging(false);
+            }, 100);
+        }
+    };
+
     const handleWheel = (e: React.WheelEvent) => {
+        e.preventDefault();
         if (e.deltaY < 0) {
             handleZoomIn();
         } else {
@@ -382,11 +452,6 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                     <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-baseline">
                             <h2 className="text-lg md:text-xl font-bold truncate">{title}</h2>
-                            {subtitle && (
-                                <p className="text-xs md:text-sm opacity-90 leading-relaxed sm:ml-2 truncate">
-                                    ({subtitle})
-                                </p>
-                            )}
                         </div>
                     </div>
                     <span className={`${backgroundColor.replace('bg-', 'bg-').replace('500', '600')} px-2 md:px-3 py-1 rounded-full text-xs md:text-sm flex-shrink-0 ml-2`}>
@@ -396,7 +461,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
             </div>
 
             <div className="p-2 md:p-4 flex-1 flex flex-col min-h-0">
-                {/* Zoom Controls - Responsive */}
+                {/* Zoom Controls */}
                 <div className="flex items-center justify-between mb-2 md:mb-3 flex-shrink-0">
                     <div className="flex items-center space-x-1 md:space-x-2">
                         <button
@@ -426,7 +491,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                     </div>
                 </div>
 
-                {/* Map Container */}
+                {/* Map Container - Google Maps style */}
                 <div
                     ref={containerRef}
                     className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 transition-colors duration-200 overflow-hidden relative"
@@ -435,10 +500,14 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                     onMouseUp={handleMouseUp}
                     onMouseLeave={handleMouseUp}
                     onWheel={handleWheel}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
                     style={{
                         cursor: scale > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default',
                         userSelect: 'none',
-                        minHeight: '300px'
+                        minHeight: '300px',
+                        touchAction: 'none' // Prevents default touch behaviors
                     }}
                 >
                     <div
@@ -453,14 +522,15 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                         <div className="text-gray-500 dark:text-gray-400">Đang tải bản đồ...</div>
                     </div>
 
-                    {/* Tooltip */}
+                    {/* Tooltip - Mobile optimized */}
                     {isTooltipVisible && tooltipContent && (
                         <div
                             className="absolute z-50 bg-gray-900 bg-opacity-95 text-white px-3 py-2 rounded-lg text-xs md:text-sm pointer-events-none max-w-xs shadow-lg"
                             style={{
-                                left: Math.min(tooltipPosition.x, (containerRef.current?.clientWidth || 0) - 200),
-                                top: Math.max(tooltipPosition.y - 10, 10),
-                                transform: tooltipPosition.y > 50 ? 'translateY(-100%)' : 'translateY(0)'
+                                left: isMobile() ? '50%' : Math.min(tooltipPosition.x, (containerRef.current?.clientWidth || 0) - 200),
+                                top: isMobile() ? '50%' : Math.max(tooltipPosition.y - 10, 10),
+                                transform: isMobile() ? 'translate(-50%, -50%)' :
+                                    tooltipPosition.y > 50 ? 'translateY(-100%)' : 'translateY(0)'
                             }}
                         >
                             <div className="font-semibold mb-1 text-blue-300">
@@ -469,10 +539,13 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
                             <div className="leading-relaxed">
                                 {tooltipContent}
                             </div>
-                            {/* Close instruction */}
-                            <div className="mt-2 text-xs opacity-75 border-t border-gray-600 pt-1">
-                                {isMobile() ? 'Chạm vào chỗ khác để đóng' : 'Click vào chỗ khác để đóng'}
-                            </div>
+                        </div>
+                    )}
+
+                    {/* Mobile zoom instruction */}
+                    {isMobile() && (
+                        <div className="absolute bottom-2 left-2 text-xs text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 px-2 py-1 rounded opacity-60 pointer-events-none">
+                            Chụm 2 ngón để zoom
                         </div>
                     )}
                 </div>
