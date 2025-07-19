@@ -4,7 +4,7 @@ import { useMapLogic } from '../hooks/useMapLogic';
 import { SVGMerger } from '../utils/svgMerger';
 import MapDisplay, { type MapDisplayRef } from '../components/map/MapDisplay.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner, faExclamationTriangle, faArrowDown } from '@fortawesome/free-solid-svg-icons';
+import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
 const Map: React.FC = () => {
     const { provinces, provincesMerged, provinceMapping, mergeInfo, loading, error } = useProvinceData();

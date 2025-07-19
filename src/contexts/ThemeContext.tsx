@@ -23,7 +23,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         if (savedMode !== null) {
             return JSON.parse(savedMode);
         }
-        return window.matchMedia('(prefers-color-scheme: dark)').matches;
+        // return window.matchMedia('(prefers-color-scheme: dark)').matches;
+        return false;
     });
 
     useEffect(() => {
