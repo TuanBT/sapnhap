@@ -7,7 +7,8 @@ import {
     faArrowRight,
     faChevronDown,
     faChevronUp,
-    faFileText
+    faFileText,
+    faXmark
 } from '@fortawesome/free-solid-svg-icons';
 import type { FlatSearchItem } from '../hooks/useSearchData';
 import type { AdministrativeUnit } from '../types/administrative';
@@ -163,7 +164,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                             <div className="text-sm text-gray-600 dark:text-gray-300">
                                 {item.newDistrict && item.newDistrict !== "∅" && item.newDistrict !== "—"
                                     ? highlightText(item.newDistrict, searchQuery)
-                                    : <span className="text-gray-400 italic">Tinh gọn cấp Quận/Huyện</span>
+                                    : <span className="text-gray-400 italic"><FontAwesomeIcon icon={faXmark}/></span>
                                 }
                             </div>
                         </div>
@@ -242,7 +243,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                             <div className="text-gray-600 dark:text-gray-300">
                                 {newUnit.district && newUnit.district !== "∅" && newUnit.district !== "—"
                                     ? highlightText(newUnit.district, searchQuery)
-                                    : <span className="text-gray-400 italic">Tinh gọn cấp Quận/Huyện</span>
+                                    : <span className="text-gray-400 italic"><FontAwesomeIcon icon={faXmark}/></span>
                                 }
                             </div>
                             <div className="text-gray-600 dark:text-gray-300">
