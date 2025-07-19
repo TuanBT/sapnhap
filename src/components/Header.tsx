@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMap, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '../contexts/ThemeContext';
 
 const Header: React.FC = () => {
@@ -14,8 +14,8 @@ const Header: React.FC = () => {
                 <div className="flex justify-between items-center py-4">
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-                        <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                            <FontAwesomeIcon icon={faMap} className="text-white text-lg" />
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                            <img src="/images/logo512.png" alt="Logo" className="w-10 h-10 rounded-lg"/>
                         </div>
                         <div>
                             <h1 className="text-xl font-bold text-gray-900 dark:text-white">

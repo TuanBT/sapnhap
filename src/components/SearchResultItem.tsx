@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo, memo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
@@ -162,7 +161,10 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                 {highlightText(item.newProvince || '', searchQuery)}
                             </div>
                             <div className="text-sm text-gray-600 dark:text-gray-300">
-                                {item.newDistrict === "—" ? "—" : highlightText(item.newDistrict || '', searchQuery)}
+                                {item.newDistrict && item.newDistrict !== "∅" && item.newDistrict !== "—"
+                                    ? highlightText(item.newDistrict, searchQuery)
+                                    : <span className="text-gray-400 italic">Tinh gọn cấp Quận/Huyện</span>
+                                }
                             </div>
                         </div>
                     </div>
@@ -171,7 +173,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
         );
     }
 
-    // Commune result
+    // Commune result - CẢI THIỆN CHÍNH
     if (item.level === 'commune') {
         const newUnit = item.newUnit || { province: '', district: '', ward: '' };
 
@@ -186,9 +188,6 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                     </div>
 
                     <div className="flex items-center space-x-3">
-                        {/*<span className="text-xs text-gray-500 dark:text-gray-400">
-                            {sortedOldUnits.length} → 1
-                        </span>*/}
                         <button
                             onClick={() => setShowDetails(!showDetails)}
                             className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 flex items-center space-x-1"
@@ -199,50 +198,54 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                     </div>
                 </div>
 
-                <div className="flex items-start space-x-4">
-                    <div className="flex-1">
-                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Trước sắp xếp</div>
+                {/* Layout 3 dòng cân đối */}
+                <div className="grid grid-cols-[1fr_auto_1fr] gap-4 items-start">
+                    {/* Cột TRƯỚC */}
+                    <div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Trước</div>
                         <div className="space-y-2">
-                            {/* Hiển thị 1 đơn vị đầu tiên (đã được sắp xếp để unit match lên đầu) */}
+                            {/* Unit đầu tiên (match query) */}
                             {sortedOldUnits.slice(0, 1).map((unit: AdministrativeUnit, index: number) => (
-                                <div key={index} className="text-sm">
+                                <div key={index} className="text-sm space-y-1">
                                     <div className="font-medium text-gray-900 dark:text-white">
                                         {highlightText(unit.province, searchQuery)}
                                     </div>
                                     <div className="text-gray-600 dark:text-gray-300">
                                         {unit.district && unit.district !== "∅" && highlightText(unit.district, searchQuery)}
-                                        {unit.district && unit.district !== "∅" && " • "}
+                                    </div>
+                                    <div className="text-gray-600 dark:text-gray-300">
                                         {highlightText(unit.ward, searchQuery)}
                                     </div>
                                 </div>
                             ))}
-                            {/* Hiển thị "+x đơn vị khác" nếu có hơn 1 đơn vị */}
-                            {sortedOldUnits.length > 1 && (
-                                <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {/* Thông tin thêm */}
+                            {!showDetails && sortedOldUnits.length > 1 && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                                     +{sortedOldUnits.length - 1} đơn vị khác
                                 </div>
                             )}
                         </div>
                     </div>
 
-                    <div className="flex-shrink-0 pt-6">
+                    {/* Mũi tên */}
+                    <div className="flex justify-center pt-8">
                         <FontAwesomeIcon icon={faArrowRight} className="text-gray-400" />
                     </div>
 
-                    <div className="flex-1">
-                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Sau sắp xếp</div>
-                        <div className="text-sm">
+                    {/* Cột SAU */}
+                    <div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400 mb-2">Sau</div>
+                        <div className="text-sm space-y-1">
                             <div className="font-medium text-gray-900 dark:text-white">
                                 {highlightText(newUnit.province, searchQuery)}
                             </div>
                             <div className="text-gray-600 dark:text-gray-300">
-                                {/* Bỏ ký hiệu "— •" khi district là "—" hoặc rỗng */}
-                                {newUnit.district && newUnit.district !== "∅" && newUnit.district !== "—" && (
-                                    <>
-                                        {highlightText(newUnit.district, searchQuery)}
-                                        {" • "}
-                                    </>
-                                )}
+                                {newUnit.district && newUnit.district !== "∅" && newUnit.district !== "—"
+                                    ? highlightText(newUnit.district, searchQuery)
+                                    : <span className="text-gray-400 italic">Tinh gọn cấp Quận/Huyện</span>
+                                }
+                            </div>
+                            <div className="text-gray-600 dark:text-gray-300">
                                 {highlightText(newUnit.ward, searchQuery)}
                             </div>
                         </div>
@@ -261,14 +264,12 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                 </h4>
                                 <div className="space-y-2">
                                     {sortedOldUnits.map((unit: AdministrativeUnit, index: number) => (
-                                        <div key={index} className="text-sm bg-gray-50 dark:bg-gray-700 rounded p-2">
-                                            <div className="font-medium text-gray-900 dark:text-white">
-                                                {highlightText(unit.province, searchQuery)}
-                                            </div>
-                                            <div className="text-gray-600 dark:text-gray-300">
-                                                {unit.district && unit.district !== "∅" && highlightText(unit.district, searchQuery)}
-                                                {unit.district && unit.district !== "∅" && " • "}
-                                                {highlightText(unit.ward, searchQuery)}
+                                        <div key={index} className="text-sm bg-gray-50 dark:bg-gray-700 rounded p-3">
+                                            <div className="text-gray-900 dark:text-white">
+                                                <span
+                                                    className="font-medium">{highlightText(unit.province, searchQuery)}</span> • <span
+                                                className="font-normal">{unit.district && unit.district !== "∅" && highlightText(unit.district, searchQuery)}</span> • <span
+                                                className="text-gray-600 dark:text-gray-300">{highlightText(unit.ward, searchQuery)}</span>
                                             </div>
                                         </div>
                                     ))}
@@ -282,11 +283,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                         <FontAwesomeIcon icon={faFileText} className="text-gray-500"/>
                                         <span>Sắp xếp các đơn vị hành chính cấp xã của {newUnit.province}</span>
                                     </h4>
-                                    <div
-                                        className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3 space-y-2">
+                                    <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded p-3">
                                         <div className="text-gray-600 dark:text-gray-400">{item.document}</div>
                                     </div>
-                                    <span className="text-xs text-gray-500"></span>
                                 </div>
                             )}
                         </div>
