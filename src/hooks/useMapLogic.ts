@@ -91,8 +91,6 @@ export const useMapLogic = ({
             const mappedId = provinceMapping[provinceId];
             if (mappedId) {
                 targetIds = [mappedId];
-            } else {
-                console.warn(`No mapping found for ${provinceId} (${provinces[provinceId]})`);
             }
         } else {
             // Từ bản đồ sau sáp nhập -> tìm các tỉnh tương ứng ở bản đồ trước sáp nhập
@@ -102,8 +100,6 @@ export const useMapLogic = ({
                 targetIds = Object.keys(provinceMapping).filter(oldId =>
                     provinceMapping[oldId] === provinceId
                 );
-            } else {
-                console.warn(`No merge info found for ${provinceId} (${provincesMerged[provinceId]})`);
             }
         }
 
@@ -112,8 +108,6 @@ export const useMapLogic = ({
             const targetElement = findElementById(otherSvg, targetId);
             if (targetElement) {
                 highlightElement(targetElement);
-            } else {
-                console.warn(`Element with ID ${targetId} not found in ${otherMapType} map`);
             }
         });
     };
@@ -143,49 +137,66 @@ export const useMapLogic = ({
         if (mapType === 'before') {
             // Từ bản đồ hiện tại (63 tỉnh)
             const beforeProvinceName = provinces[provinceId] || provinceId;
-            hoveredProvince = beforeProvinceName; // Tỉnh đang hover
+            hoveredProvince = beforeProvinceName;
 
             const mappedId = provinceMapping[provinceId];
 
             if (mappedId && provincesMerged[mappedId]) {
                 mergedName = provincesMerged[mappedId];
 
-                const info = mergeInfo[mappedId];
-                if (info) {
-                    beforeName = info.originalProvinces.join(', ');
-                    allRelated = info.originalProvinces.join(', '); // Tất cả tỉnh liên quan
-                    desc = info.description || `${beforeProvinceName} được sáp nhập vào ${mergedName}`;
-                    related = info.originalProvinces;
-                } else {
+                // Kiểm tra nếu tên cũ giống tên mới -> không thay đổi
+                if (beforeProvinceName === mergedName) {
                     beforeName = beforeProvinceName;
                     allRelated = beforeProvinceName;
-                    desc = `${beforeProvinceName} được sáp nhập vào ${mergedName}`;
+                    desc = `Không đổi tên`;
                     related = [beforeProvinceName];
+                } else {
+                    // Có sự thay đổi thực sự
+                    const info = mergeInfo[mappedId];
+                    if (info) {
+                        beforeName = info.originalProvinces.join(', ');
+                        allRelated = info.originalProvinces.join(', ');
+                        desc = `Sáp nhập vào ${mergedName}`;
+                        related = info.originalProvinces;
+                    } else {
+                        beforeName = beforeProvinceName;
+                        allRelated = beforeProvinceName;
+                        desc = `Sáp nhập vào ${mergedName}`;
+                        related = [beforeProvinceName];
+                    }
                 }
             } else {
-                // Tỉnh không được sáp nhập hoặc không tìm thấy mapping
+                // Không có mapping -> tỉnh không thay đổi
                 beforeName = beforeProvinceName;
                 mergedName = beforeProvinceName;
                 allRelated = beforeProvinceName;
-                desc = `${beforeProvinceName} không được sáp nhập hoặc không có thông tin`;
+                desc = `${beforeProvinceName} không thay đổi`;
                 related = [beforeProvinceName];
             }
         } else {
             // Từ bản đồ sau sáp nhập (34 tỉnh)
             mergedName = provincesMerged[provinceId] || provinceId;
-            hoveredProvince = mergedName; // Tỉnh đang hover
+            hoveredProvince = mergedName;
 
             const info = mergeInfo[provinceId];
             if (info && info.originalProvinces) {
                 beforeName = info.originalProvinces.join(', ');
-                allRelated = info.originalProvinces.join(', '); // Tất cả tỉnh gốc
+                allRelated = info.originalProvinces.join(', ');
                 related = info.originalProvinces;
-                desc = info.description || `${mergedName} được tạo thành từ việc sáp nhập ${info.originalProvinces.join(', ')}`;
+
+                // Kiểm tra nếu chỉ có 1 tỉnh gốc và tên giống nhau -> không thay đổi
+                if (info.originalProvinces.length === 1 && info.originalProvinces[0] === mergedName) {
+                    desc = `${mergedName} không thay đổi`;
+                } else {
+                    // Có sự gộp thực sự
+                    desc = `Gộp từ ${info.originalProvinces.join(', ')}`;
+                }
             } else {
+                // Không có info -> tỉnh không thay đổi
                 beforeName = mergedName;
                 allRelated = mergedName;
                 related = [mergedName];
-                desc = `${mergedName} không có thông tin sáp nhập`;
+                desc = `${mergedName} không thay đổi`;
             }
         }
 

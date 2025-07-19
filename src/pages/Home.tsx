@@ -32,7 +32,7 @@ const Home: React.FC = () => {
                         }
                         `}
                     >
-                        So sánh bản đồ
+                        Bản đồ
                     </button>
                 </div>
             </div>
