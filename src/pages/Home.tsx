@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Search from './Search';
-import Comparison from './Comparison';
+import Map from './Map.tsx';
 
 const Home: React.FC = () => {
     const [activeTab, setActiveTab] = useState<'search' | 'comparison'>('search');
@@ -67,7 +67,7 @@ const SearchTab: React.FC = () => {
 const ComparisonTab: React.FC = () => {
     return (
         <div className="pt-6">
-            <Comparison />
+            <Map />
         </div>
     );
 };

@@ -1,8 +1,8 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faInfoCircle } from '@fortawesome/free-solid-svg-icons';
-import SearchResultItem from './SearchResultItem';
-import type { FlatSearchItem } from '../hooks/useSearchData';
+import SearchResultItem from './SearchResultItem.tsx';
+import type { FlatSearchItem } from '../../hooks/useSearchData.ts';
 
 interface SearchResultsProps {
     results: FlatSearchItem[];

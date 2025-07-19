@@ -2,11 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useProvinceData } from '../hooks/useProvinceData';
 import { useMapLogic } from '../hooks/useMapLogic';
 import { SVGMerger } from '../utils/svgMerger';
-import MapDisplay, { type MapDisplayRef } from '../components/MapDisplay';
+import MapDisplay, { type MapDisplayRef } from '../components/map/MapDisplay.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 
-const Comparison: React.FC = () => {
+const Map: React.FC = () => {
     const { provinces, provincesMerged, provinceMapping, mergeInfo, loading, error } = useProvinceData();
     const [processedSvgContent, setProcessedSvgContent] = useState<string>('');
     const [activeTab, setActiveTab] = useState<'before' | 'merged'>('before'); // State cho tab mobile
@@ -213,4 +213,4 @@ const Comparison: React.FC = () => {
     );
 };
 
-export default Comparison;
+export default Map;

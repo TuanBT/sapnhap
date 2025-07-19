@@ -10,9 +10,9 @@ import {
     faFileText,
     faXmark
 } from '@fortawesome/free-solid-svg-icons';
-import type { FlatSearchItem } from '../hooks/useSearchData';
-import type { AdministrativeUnit } from '../types/administrative';
-import { normalizeForSearch } from '../utils/searchUtils';
+import type { FlatSearchItem } from '../../hooks/useSearchData.ts';
+import type { AdministrativeUnit } from '../../types/administrative.ts';
+import { normalizeForSearch } from '../../utils/searchUtils.ts';
 
 interface SearchResultItemProps {
     item: FlatSearchItem;

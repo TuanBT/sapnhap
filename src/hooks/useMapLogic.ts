@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, type RefObject } from 'react';
-import { type MapDisplayRef } from '../components/MapDisplay';
+import { type MapDisplayRef } from '../components/map/MapDisplay.tsx';
 
 interface MergeInfo {
     [key: string]: {

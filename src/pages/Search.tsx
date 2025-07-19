@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { useSearchData } from '../hooks/useSearchData';
-import SearchHeader from '../components/SearchHeader';
-import SearchResults from '../components/SearchResults';
+import SearchHeader from '../components/search/SearchHeader.tsx';
+import SearchResults from '../components/search/SearchResults.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 

@@ -1,5 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Comparison from './pages/Comparison';
+import Map from './pages/Map.tsx';
 import Home from './pages/Home';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -15,7 +15,7 @@ function App() {
                     <main className="flex-grow">
                         <Routes>
                             <Route path="/" element={<Home />} />
-                            <Route path="/comparison" element={<Comparison />} />
+                            <Route path="/comparison" element={<Map />} />
                         </Routes>
                     </main>
 
