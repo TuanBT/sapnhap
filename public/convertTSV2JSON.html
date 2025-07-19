@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -92,6 +93,16 @@
             transform: translateY(-2px);
         }
 
+        .btn-warning {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+        }
+
         .btn-danger {
             background: #f44336;
             color: white;
@@ -119,6 +130,15 @@
             border-left: 4px solid #f44336;
         }
 
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+        }
+
         .example {
             background: #f0f8ff;
             padding: 15px;
@@ -127,6 +147,14 @@
             border-left: 4px solid #2196F3;
             font-family: 'Courier New', monospace;
             font-size: 12px;
+        }
+
+        .file-info {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #ff9800;
         }
 
         .grid {
@@ -148,7 +176,14 @@
 </head>
 <body>
 <div class="container">
-    <h1>🔄 Convert Data to JSON for Search App</h1>
+    <h1>🔄 Convert TSV to Minified JSON</h1>
+
+    <div class="file-info">
+        <strong>📁 Auto File Processing:</strong><br>
+        • Input: <code>public/thongtinhanhchinh.tsv</code><br>
+        • Output: <code>public/thongtinhanhchinh.min.json</code> (minified)<br>
+        • Click "Load TSV File" to automatically read from the TSV file
+    </div>
 
     <div class="section">
         <h3>📝 Input Data (Tab-separated format)</h3>
@@ -156,26 +191,24 @@
             <strong>Expected format:</strong><br>
             Tỉnh/TP mới &Tab; Phường/Xã mới &Tab; Tỉnh/TP cũ &Tab; Quận/Huyện cũ &Tab; Phường/Xã cũ &Tab; Văn bản
         </div>
-        <textarea id="input" placeholder="Paste your tab-separated data here...
-
-Example:
-Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Ninh Kiều	phường Tân An	1. Sắp xếp toàn bộ...
-Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Ninh Kiều	phường Thới Bình	1. Sắp xếp toàn bộ..."></textarea>
+        <textarea id="input" placeholder="TSV data will be loaded here automatically..."></textarea>
     </div>
 
     <div class="buttons">
+        <button class="btn-warning" onclick="loadTSVFile()">📂 Load TSV File</button>
         <button class="btn-primary" onclick="convertToJSON()">🔄 Convert to JSON</button>
         <button class="btn-secondary" onclick="copyResult()">📋 Copy Result</button>
-        <button class="btn-secondary" onclick="downloadJSON()">💾 Download JSON</button>
+        <button class="btn-secondary" onclick="downloadMinifiedJSON()">💾 Save as .min.json</button>
         <button class="btn-danger" onclick="clearAll()">🗑️ Clear All</button>
     </div>
 
     <div id="stats"></div>
     <div id="error"></div>
+    <div id="success"></div>
 
     <div class="section">
-        <h3>📊 Output JSON (Optimized for Search)</h3>
-        <textarea id="output" readonly placeholder="Converted JSON will appear here..."></textarea>
+        <h3>📊 Output JSON (Minified for Production)</h3>
+        <textarea id="output" readonly placeholder="Minified JSON will appear here..."></textarea>
     </div>
 
     <div class="section">
@@ -187,6 +220,31 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
 <script>
     let convertedData = null;
 
+    // Load TSV file from public directory
+    async function loadTSVFile() {
+        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+
+        errorDiv.innerHTML = '';
+        successDiv.innerHTML = '';
+
+        try {
+            const response = await fetch('./thongtinhanhchinh.tsv');
+
+            if (!response.ok) {
+                throw new Error(`Failed to load TSV file: ${response.status} ${response.statusText}`);
+            }
+
+            const tsvContent = await response.text();
+            document.getElementById('input').value = tsvContent;
+
+            showSuccess(`✅ Successfully loaded TSV file from public/thongtinhanhchinh.tsv (${formatFileSize(tsvContent.length)})`);
+
+        } catch (error) {
+            showError(`Failed to load TSV file: ${error.message}. Make sure the file exists at public/thongtinhanhchinh.tsv`);
+        }
+    }
+
     function convertToJSON() {
         const input = document.getElementById('input').value.trim();
         const errorDiv = document.getElementById('error');
@@ -196,7 +254,7 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
         statsDiv.innerHTML = '';
 
         if (!input) {
-            showError('Please enter some data to convert!');
+            showError('Please load TSV data first or enter some data to convert!');
             return;
         }
 
@@ -300,13 +358,16 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
             };
 
             convertedData = result;
-            document.getElementById('output').value = JSON.stringify(result, null, 2);
+
+            // Display MINIFIED JSON
+            const minifiedJson = JSON.stringify(result);
+            document.getElementById('output').value = minifiedJson;
 
             // Show preview
             showPreview(result);
 
-            // Show stats
-            showStats(result);
+            // Show stats with size info
+            showStatsWithSize(result, minifiedJson);
 
         } catch (error) {
             showError(`Error processing data: ${error.message}`);
@@ -338,27 +399,47 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
         preview.value = previewText;
     }
 
-    function showStats(data) {
+    function showStatsWithSize(data, minifiedJson) {
         const statsDiv = document.getElementById('stats');
         const typeStats = data.changes.reduce((acc, change) => {
             acc[change.type] = (acc[change.type] || 0) + 1;
             return acc;
         }, {});
 
+        const prettyJson = JSON.stringify(data, null, 2);
+        const minifiedSize = new Blob([minifiedJson]).size;
+        const prettySize = new Blob([prettyJson]).size;
+        const reduction = ((prettySize - minifiedSize) / prettySize * 100).toFixed(1);
+
         statsDiv.innerHTML = `
-                <strong>📊 Conversion Statistics:</strong><br>
-                • Total Changes: ${data.metadata.totalChanges}<br>
-                • Total Old Units: ${data.metadata.totalOldUnits}<br>
-                • Merges: ${typeStats.merge || 0}<br>
-                • Renames: ${typeStats.rename || 0}<br>
-                • Unchanged: ${typeStats.unchanged || 0}<br>
-                • Generated: ${new Date(data.metadata.generatedAt).toLocaleString('vi-VN')}
-            `;
+            <strong>📊 Conversion Statistics:</strong><br>
+            • Total Changes: ${data.metadata.totalChanges}<br>
+            • Total Old Units: ${data.metadata.totalOldUnits}<br>
+            • Merges: ${typeStats.merge || 0}<br>
+            • Renames: ${typeStats.rename || 0}<br>
+            • Unchanged: ${typeStats.unchanged || 0}<br>
+            • Generated: ${new Date(data.metadata.generatedAt).toLocaleString('vi-VN')}<br>
+            <br><strong>📏 File Size:</strong><br>
+            • Pretty JSON: ${formatFileSize(prettySize)}<br>
+            • Minified JSON: ${formatFileSize(minifiedSize)}<br>
+            • Reduction: <span style="color: #4CAF50">${reduction}% smaller</span>
+        `;
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' bytes';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
     }
 
     function showError(message) {
         const errorDiv = document.getElementById('error');
         errorDiv.innerHTML = `<strong>❌ Error:</strong> ${message}`;
+    }
+
+    function showSuccess(message) {
+        const successDiv = document.getElementById('success');
+        successDiv.innerHTML = `<strong>✅ Success:</strong> ${message}`;
     }
 
     function copyResult() {
@@ -369,31 +450,33 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
         }
 
         navigator.clipboard.writeText(output.value).then(() => {
-            alert('✅ JSON copied to clipboard!');
+            showSuccess('JSON copied to clipboard!');
         }).catch(() => {
             output.select();
             document.execCommand('copy');
-            alert('✅ JSON copied to clipboard!');
+            showSuccess('JSON copied to clipboard!');
         });
     }
 
-    function downloadJSON() {
+    function downloadMinifiedJSON() {
         if (!convertedData) {
             showError('No data to download! Please convert some data first.');
             return;
         }
 
-        const jsonString = JSON.stringify(convertedData, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
+        const minifiedJson = JSON.stringify(convertedData);
+        const blob = new Blob([minifiedJson], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
 
         const a = document.createElement('a');
         a.href = url;
-        a.download = `administrative-changes-${new Date().toISOString().split('T')[0]}.json`;
+        a.download = 'thongtinhanhchinh.min.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
+
+        showSuccess(`Downloaded as thongtinhanhchinh.min.json (${formatFileSize(minifiedJson.length)})`);
     }
 
     function clearAll() {
@@ -403,20 +486,14 @@ Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Nin
             document.getElementById('preview').value = '';
             document.getElementById('stats').innerHTML = '';
             document.getElementById('error').innerHTML = '';
+            document.getElementById('success').innerHTML = '';
             convertedData = null;
         }
     }
 
-    // Load sample data for demo
+    // Auto-load TSV file on page load
     window.onload = function() {
-        const sampleData = `Tỉnh/Thành Phố mới	Tên phường/xã mới	Tỉnh/Thành Phố cũ	Quận/Huyện Cũ	Tên phường/xã cũ	Văn bản sắp xếp
-Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Ninh Kiều	phường Tân An	1. Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Tân An, Thới Bình và Xuân Khánh thành phường mới có tên gọi là phường Ninh Kiều.
-Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Ninh Kiều	phường Thới Bình	1. Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Tân An, Thới Bình và Xuân Khánh thành phường mới có tên gọi là phường Ninh Kiều.
-Thành Phố Cần Thơ	phường Ninh Kiều	Thành phố Cần Thơ	Quận Ninh Kiều	phường Xuân Khánh	1. Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của các phường Tân An, Thới Bình và Xuân Khánh thành phường mới có tên gọi là phường Ninh Kiều.
-Tỉnh Phú Yên	xã Hòa Quang	Tỉnh Phú Yên	Huyện Tây Hòa	xã Hòa Quang Nam	2. Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Hòa Quang Nam và xã Hòa Quang Bắc thành xã mới có tên gọi là xã Hòa Quang.
-Tỉnh Phú Yên	xã Hòa Quang	Tỉnh Phú Yên	Huyện Tây Hòa	xã Hòa Quang Bắc	2. Sắp xếp toàn bộ diện tích tự nhiên, quy mô dân số của xã Hòa Quang Nam và xã Hòa Quang Bắc thành xã mới có tên gọi là xã Hòa Quang.`;
-
-        document.getElementById('input').value = sampleData;
+        loadTSVFile();
     };
 </script>
 </body>

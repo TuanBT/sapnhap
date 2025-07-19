@@ -137,7 +137,7 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
 // Function to load data from JSON file
 export async function loadSearchData(): Promise<SearchItem[]> {
     try {
-        const response = await fetch('/thongtinhanhchinh.json');
+        const response = await fetch('/thongtinhanhchinh.min.json');
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
