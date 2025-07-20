@@ -7,67 +7,50 @@ const Home: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-            {/* Tab Navigation */}
-            <div className="container mx-auto px-4 pt-6">
-                <div className="flex bg-white dark:bg-gray-800 rounded-2xl p-1.5 shadow-md max-w-sm mx-auto">
-                    <button
-                        onClick={() => setActiveTab('search')}
-                        className={`
-                            flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all duration-300
-                            ${activeTab === 'search'
-                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                        }
-                        `}
-                    >
-                        Tìm kiếm
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('comparison')}
-                        className={`
-                            flex-1 py-2 px-4 rounded-xl font-medium text-sm transition-all duration-300
-                            ${activeTab === 'comparison'
-                            ? 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                            : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
-                        }
-                        `}
-                    >
-                        Bản đồ
-                    </button>
+            {/* Simple Header */}
+            <div className="container mx-auto px-4 pt-8 pb-4">
+                {/* Minimal Tab Navigation */}
+                <div className="flex justify-center mb-8">
+                    <div className="inline-flex bg-gray-100 dark:bg-gray-800 rounded-2xl p-1">
+                        <button
+                            onClick={() => setActiveTab('search')}
+                            className={`
+                                px-4 py-2 text-sm font-medium rounded-2xl transition-all duration-200
+                                ${activeTab === 'search'
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                            }
+                            `}
+                        >
+                            Tìm kiếm
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('comparison')}
+                            className={`
+                                px-4 py-2 text-sm font-medium rounded-2xl transition-all duration-200
+                                ${activeTab === 'comparison'
+                                ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                            }
+                            `}
+                        >
+                            Bản đồ
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            {/* Tab Content */}
-            <div className="tab-content">
+                {/* Tab Content */}
                 {activeTab === 'search' && (
                     <div className="animate-fadeIn">
-                        <SearchTab />
+                        <Search />
                     </div>
                 )}
                 {activeTab === 'comparison' && (
                     <div className="animate-fadeIn">
-                        <ComparisonTab />
+                        <Map />
                     </div>
                 )}
             </div>
-        </div>
-    );
-};
-
-// Component for Search Tab
-const SearchTab: React.FC = () => {
-    return (
-        <div className="pt-6">
-            <Search />
-        </div>
-    );
-};
-
-// Component for Comparison Tab
-const ComparisonTab: React.FC = () => {
-    return (
-        <div className="pt-6">
-            <Map />
         </div>
     );
 };

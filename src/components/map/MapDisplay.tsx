@@ -442,7 +442,7 @@ const MapDisplay = forwardRef<MapDisplayRef, MapDisplayProps>(({
     };
 
     return (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden transition-colors duration-200 h-full flex flex-col">
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden transition-colors duration-200 h-full flex flex-col">
             <div className={`${backgroundColor} text-white p-2 md:p-4 flex-shrink-0`}>
                 <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">

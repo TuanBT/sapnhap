@@ -100,7 +100,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
     // Province result
     if (item.level === 'province') {
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center space-x-3 mb-3">
                     <FontAwesomeIcon icon={config.icon} className={config.color} />
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -132,7 +132,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
     // District result
     if (item.level === 'district') {
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center space-x-3 mb-3">
                     <FontAwesomeIcon icon={config.icon} className={config.color} />
                     <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
@@ -179,7 +179,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
         const newUnit = item.newUnit || { province: '', district: '', ward: '' };
 
         return (
-            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-4">
                 <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center space-x-3">
                         <FontAwesomeIcon icon={config.icon} className={config.color} />
@@ -265,7 +265,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = memo(({ item, searchQu
                                 </h4>
                                 <div className="space-y-2">
                                     {sortedOldUnits.map((unit: AdministrativeUnit, index: number) => (
-                                        <div key={index} className="text-sm bg-gray-50 dark:bg-gray-700 rounded p-3">
+                                        <div key={index} className="text-sm bg-gray-50 dark:bg-gray-700 rounded-2xl p-3">
                                             <div className="text-gray-900 dark:text-white">
                                                 <span
                                                     className="font-medium">{highlightText(unit.province, searchQuery)}</span> • <span
