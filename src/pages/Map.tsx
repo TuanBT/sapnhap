@@ -125,7 +125,7 @@ const Map: React.FC = () => {
                 <div className="lg:hidden space-y-4">
 
                     {/* Map 1: Bản đồ TRƯỚC sáp nhập */}
-                    <div className="h-[100vh]">
+                    <div className="h-[80vh]">
                         <MapDisplay
                             ref={beforeMapRef}
                             title={currentHoveredProvince || beforeProvinceName}
@@ -144,7 +144,7 @@ const Map: React.FC = () => {
                     </div>
 
                     {/* Map 2: Bản đồ SAU sáp nhập */}
-                    <div className="h-[100vh]">
+                    <div className="h-[80vh]">
                         <MapDisplay
                             ref={mergedMapRef}
                             title={currentHoveredProvince || mergedProvinceName}
