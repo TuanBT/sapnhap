@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { assetUrl } from '../../utils/assetUrl';
 
 interface MapSectionProps {
     selectedProvince: string | null;
@@ -21,7 +22,7 @@ export function MapSection({
             if (!svgRef.current) return;
 
             try {
-                const response = await fetch('/vn.svg');
+                const response = await fetch(assetUrl('vn.svg'));
                 const svgContent = await response.text();
                 svgRef.current.innerHTML = svgContent;
 

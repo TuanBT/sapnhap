@@ -1,5 +1,6 @@
 
 import type { SearchItem, CommuneSearchItem, ProvinceSearchItem, DistrictSearchItem, AdministrativeUnit } from '../types/administrative';
+import { assetUrl } from './assetUrl';
 
 // JSON structure from thongtinhanhchinh.json
 interface JsonChange {
@@ -137,7 +138,7 @@ export function parseJsonData(jsonData: JsonData): SearchItem[] {
 // Function to load data from JSON file
 export async function loadSearchData(): Promise<SearchItem[]> {
     try {
-        const response = await fetch('/thongtinhanhchinh.min_v1.3.json');
+        const response = await fetch(assetUrl('thongtinhanhchinh.min_v1.3.json'));
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }

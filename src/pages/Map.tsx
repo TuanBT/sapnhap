@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useProvinceData } from '../hooks/useProvinceData';
 import { useMapLogic } from '../hooks/useMapLogic';
 import { SVGMerger } from '../utils/svgMerger';
+import { assetUrl } from '../utils/assetUrl';
 import MapDisplay, { type MapDisplayRef } from '../components/map/MapDisplay.tsx';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
@@ -35,7 +36,7 @@ const Map: React.FC = () => {
             if (!provinceMapping || !mergeInfo) return;
 
             try {
-                const mergedResponse = await fetch('/vn2.svg');
+                const mergedResponse = await fetch(assetUrl('vn2.svg'));
                 const mergedSvgContent = await mergedResponse.text();
 
                 const merger = new SVGMerger(provinceMapping, mergeInfo);
@@ -94,7 +95,7 @@ const Map: React.FC = () => {
                             backgroundColor="bg-blue-600"
                             onProvinceHover={handleProvinceHover}
                             onProvinceLeave={handleProvinceLeave}
-                            svgUrl="/vn.svg"
+                            svgUrl={assetUrl('vn.svg')}
                             mapType="before"
                             showTooltip={true}
                             tooltipContent={description}
@@ -112,7 +113,7 @@ const Map: React.FC = () => {
                             backgroundColor="bg-green-600"
                             onProvinceHover={handleProvinceHover}
                             onProvinceLeave={handleProvinceLeave}
-                            svgUrl="/vn2.svg"
+                            svgUrl={assetUrl('vn2.svg')}
                             mapType="merged"
                             processedSvgContent={processedSvgContent}
                             showTooltip={true}
@@ -136,7 +137,7 @@ const Map: React.FC = () => {
                             backgroundColor="bg-blue-600"
                             onProvinceHover={handleProvinceHover}
                             onProvinceLeave={handleProvinceLeave}
-                            svgUrl="/vn.svg"
+                            svgUrl={assetUrl('vn.svg')}
                             mapType="before"
                             showTooltip={true}
                             tooltipContent={description}
@@ -155,7 +156,7 @@ const Map: React.FC = () => {
                             backgroundColor="bg-green-600"
                             onProvinceHover={handleProvinceHover}
                             onProvinceLeave={handleProvinceLeave}
-                            svgUrl="/vn2.svg"
+                            svgUrl={assetUrl('vn2.svg')}
                             mapType="merged"
                             processedSvgContent={processedSvgContent}
                             showTooltip={true}

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { useTheme } from '../contexts/ThemeContext';
+import { assetUrl } from '../utils/assetUrl';
 
 const Header: React.FC = () => {
     const { darkMode, toggleDarkMode } = useTheme();
@@ -15,7 +16,7 @@ const Header: React.FC = () => {
                     {/* Logo */}
                     <Link to="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                            <img src="/images/logo512.png" alt="Logo" className="w-10 h-10 rounded-lg"/>
+                            <img src={assetUrl('images/logo512.png')} alt="Logo" className="w-10 h-10 rounded-lg"/>
                         </div>
                         <div>
                             <h1 className="text-xl font-bold text-gray-900 dark:text-white">

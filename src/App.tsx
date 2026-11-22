@@ -8,7 +8,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 function App() {
     return (
         <ThemeProvider>
-            <Router>
+            <Router basename={import.meta.env.BASE_URL}>
                 <div className="App min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200 flex flex-col">
                     <Header />
 

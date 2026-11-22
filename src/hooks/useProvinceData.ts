@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { assetUrl } from '../utils/assetUrl';
 
 interface ProvinceData {
     [key: string]: string;
@@ -34,9 +35,9 @@ export function useProvinceData(): UseProvinceDataReturn {
             try {
                 // Load tất cả file JSON
                 const [provincesRes, provincesMergedRes, mergeInfoRes] = await Promise.all([
-                    fetch('/provinces.json'),
-                    fetch('/provinces-merged.json'),
-                    fetch('/merge-info.json')
+                    fetch(assetUrl('provinces.json')),
+                    fetch(assetUrl('provinces-merged.json')),
+                    fetch(assetUrl('merge-info.json'))
                 ]);
 
                 if (!provincesRes.ok) throw new Error('Failed to load provinces.json');
