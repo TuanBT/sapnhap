@@ -4,7 +4,6 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // GitHub Pages phục vụ site tại https://tuanbt.github.io/sapnhap/
-  // Đặt cố định để dev / preview / production dùng cùng một đường dẫn.
-  base: '/sapnhap/',
+  // Site chạy ở root của custom domain https://sapnhap.buitientuan.com/ (GitHub Pages).
+  base: '/',
 })
